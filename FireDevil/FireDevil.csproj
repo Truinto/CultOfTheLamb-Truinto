@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FireDevil</RootNamespace>
+    <AssemblyName>FireDevil</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <ProjectGuid>{000603D5-05C4-43C1-AE59-C6118BC53F34}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <!-- Common references -->
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
+    <Reference Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" />
+    <Reference Include="Assembly-CSharp_publicized" HintPath="$(GameManaged)\Assembly-CSharp_publicized.dll" />
+    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
+    <Reference Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
+    <Reference Include="UnityTextMeshPro" HintPath="$(GameManaged)\Unity.TextMeshPro.dll" />
+    <Reference Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
+    <Reference Include="UnityEngine.AnimationModule" HintPath="$(GameManaged)\UnityEngine.AnimationModule.dll" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
+    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(GameManaged)\UnityEngine.ImageConversionModule.dll" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(GameManaged)\UnityEngine.IMGUIModule.dll" />
+    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(GameManaged)\UnityEngine.JSONSerializeModule.dll" />
+    <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(GameManaged)\UnityEngine.ParticleSystemModule.dll" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
+    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="Patch_MurderAction.cs" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="Settings\Repository.json" />
+    <None Include="..\README.md" />
+    <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /i /e /y /f /d "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
+
+if "$(Configuration)"=="Release" (
+   cd /d "$(ModFolder)\"
+   "C:\Program Files\7-Zip\7z.exe" u "-x!*.zip" "$(TargetName)\$(TargetName).zip" @"$(TargetName)\filelist.txt" &gt;NUL
+   echo Updated $(TargetName).zip
+)</PostBuildEvent>
+  </PropertyGroup>
+</Project>

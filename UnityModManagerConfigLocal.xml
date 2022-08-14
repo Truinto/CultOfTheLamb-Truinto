@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add a game profile to make it available locally in UMM. https://wiki.nexusmods.com/index.php/How_to_add_new_game_(UMM) -->
+<!-- Rename the file so it won't overwrite it. The file name can be anything, but it must start with UnityModManagerConfig -->
+
+<Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!-- 	<GameInfo Name="Somegame">
+	   <Folder>Somegame</Folder>
+	   <ModsDirectory>Mods</ModsDirectory>
+	   <ModInfo>Info.json</ModInfo>
+	   <GameExe>somegame.exe</GameExe>
+	   <EntryPoint>[UnityEngine.UIModule.dll]UnityEngine.Canvas.cctor:Before</EntryPoint>
+	   <StartingPoint>[Assembly-CSharp.dll]MainMenu.Start:After</StartingPoint>
+	</GameInfo> -->
+	<GameInfo Name="Cult of the Lamb">
+		<Folder>Cult of the Lamb</Folder>
+		<ModsDirectory>Mods</ModsDirectory>
+		<ModInfo>Info.json</ModInfo>
+		<GameExe>Cult Of The Lamb.exe</GameExe>
+		<EntryPoint>[UnityEngine.UIModule.dll]UnityEngine.Canvas.cctor:Before</EntryPoint>
+		<StartingPoint>[Assembly-CSharp.dll]Lamb.UI.MainMenu.MainMenu.Start:Before</StartingPoint>
+	</GameInfo>
+</Config>
