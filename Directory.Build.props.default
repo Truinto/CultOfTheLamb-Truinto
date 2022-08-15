@@ -3,8 +3,8 @@
   <PropertyGroup>
     <GOGFolder>D:\Programme\GOG Galaxy\Games\</GOGFolder>
     <GameManaged Condition="Exists('$(GOGFolder)')">$(GOGFolder)Cult of the Lamb\Cult Of The Lamb_Data\Managed</GameManaged>
-    <GameManaged Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\Lamb sources\</GameManaged>
+    <GameManaged Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\Cult sources\Cult Of The Lamb_Data\Managed</GameManaged>
     <ModFolder Condition="Exists('$(GOGFolder)')">$(GOGFolder)Cult of the Lamb\Mods</ModFolder>
-    <ModFolder Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\Lamb sources\</ModFolder>
+    <ModFolder Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\Cult sources\</ModFolder>
   </PropertyGroup>
 </Project>

@@ -25,6 +25,9 @@ namespace FireDevil
             harmony = new(modEntry.Info.Id);
 
             PatchSafe(typeof(Patch_MurderAction));
+            PatchSafe(typeof(Patch_LumberMine));
+            PatchSafe(typeof(Patch_FollowerInfo));
+            //PatchSafe(typeof(Patch_GetTasks));
 
             return true;
         }

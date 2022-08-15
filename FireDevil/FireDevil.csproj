@@ -68,7 +68,11 @@
     <Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FollowerTask_Scarecrow.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Patch_FollowerInfo.cs" />
+    <Compile Include="Patch_GetTasks.cs" />
+    <Compile Include="Patch_LumberMine.cs" />
     <Compile Include="Patch_MurderAction.cs" />
     <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="Settings\Repository.json" />
