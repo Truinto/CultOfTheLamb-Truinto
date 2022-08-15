@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 namespace FireDevil
 {
     [HarmonyPatch(typeof(FollowerInformationBox), nameof(FollowerInformationBox.ConfigureImpl))]
-    public class Patch_FollowerInfo
+    public static class Patch_FollowerInfo
     {
         public static void Postfix(FollowerInformationBox __instance)
         {
-            __instance.FollowerRole.text += $" | {__instance.FollowerInfo.FollowerRole}";
+            if (Settings.State.showFollowerRole)
+                __instance.FollowerRole.text += $" | {__instance.FollowerInfo.FollowerRole}";
         }
     }
 }

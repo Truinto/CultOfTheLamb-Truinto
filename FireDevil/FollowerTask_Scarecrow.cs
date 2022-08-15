@@ -55,6 +55,9 @@ namespace FireDevil
             }
         }
 
+        /// <summary>
+        /// Called when follower decides to start this task.
+        /// </summary>
         public override void ClaimReservations()
         {
             this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
@@ -62,6 +65,9 @@ namespace FireDevil
                 this._scareCrow.ReservedForTask = true;
         }
 
+        /// <summary>
+        /// Called when follower changes task.
+        /// </summary>
         public override void ReleaseReservations()
         {
             this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
@@ -69,6 +75,9 @@ namespace FireDevil
                 this._scareCrow.ReservedForTask = false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void OnStart()
         {
             SetState(FollowerTaskState.GoingTo);
@@ -135,7 +144,7 @@ namespace FireDevil
 
             //this._follower = follower;
             follower.FacePosition(_scareCrow.Data.Position);
-            follower.TimedAnimation("action", 3.5f, () => ProgressTask());
+            follower.TimedAnimation("action", 3.5f, () => ProgressTask()); // TODO: don't use timed
         }
 
         public override void TaskTick(float deltaGameTime)
@@ -143,7 +152,7 @@ namespace FireDevil
             if (this.State == FollowerTaskState.Doing)
             {
                 this._gameTimeSinceLastProgress += deltaGameTime;
-                ProgressTask();
+                //ProgressTask();
             }
         }
     }

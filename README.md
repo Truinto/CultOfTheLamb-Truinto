@@ -16,18 +16,21 @@ Disclaimers
 
 Installation
 -----------
-* You will need [Unity Mod Manager](https://www.nexusmods.com/site/mods/21).
+* Downalod [Unity Mod Manager](https://www.nexusmods.com/site/mods/21).
 * Unpack the manager anywhere.
-* Copy "UnityModManagerConfigLocal.xml" into the manager's folder.
+* Download a [releases](https://github.com/Truinto/CultOfTheLamb-Truinto/releases).
+* Copy "UnityModManagerConfigLocal.xml" from my mod's zip into the manager's folder.
 * Start Unity Mod Manager and select the game Cult Of The Lamb. Select your game folder (for me "GOG Galaxy\Games\Cult of the Lamb").
 * Click install.
-* Download a release [https://github.com/Truinto/CultOfTheLamb-Truinto/releases](https://github.com/Truinto/CultOfTheLamb-Truinto/releases).
 * Switch to the mod tab and drop the zip file into the manager.
 * Have fun.
 
 Content
 -----------
 * Enables murder interaction regardless of doctrine. You can probably break the introduction with this.
+* Lumber and stone have infinite resources
+* Display job description in follower thoughts
+* Menu to toggle doctines
 
 FAQ
 -----------

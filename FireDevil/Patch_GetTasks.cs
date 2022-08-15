@@ -8,20 +8,12 @@ using System.Threading.Tasks;
 namespace FireDevil
 {
     [HarmonyPatch(typeof(FollowerBrain), nameof(FollowerBrain.GetDesiredTask_Work))]
-    public class Patch_GetTasks
+    public static class Patch_GetTasks
     {
         public static bool Prefix(FollowerLocation location, FollowerBrain __instance, ref List<FollowerTask> __result)
         {
-            if (File.Exists(Main.Path + "debug.txt"))
-            {
-                File.Delete(Main.Path + "debug.txt");
-                foreach (var structureBrain in StructureManager.StructuresAtLocation(location))
-                    if (structureBrain is Structures_Scarecrow _scareCrow)
-                    {
-                        _scareCrow.HasBird = true;
-                        _scareCrow.OnCatchBird?.Invoke();
-                    }
-            }
+            if (!Settings.State.globalTaskPatch)
+                return true;
 
             var tasks = new SortedList<float, FollowerTask>(new FollowerBrain.DuplicateKeyComparer<float>());
             foreach (var structureBrain in StructureManager.StructuresAtLocation(location))

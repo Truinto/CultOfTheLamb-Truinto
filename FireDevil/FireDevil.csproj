@@ -74,6 +74,11 @@
     <Compile Include="Patch_GetTasks.cs" />
     <Compile Include="Patch_LumberMine.cs" />
     <Compile Include="Patch_MurderAction.cs" />
+    <Compile Include="Settings\BaseSettings.cs" />
+    <Compile Include="Settings\ISettings.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Unlocks.cs" />
+    <Compile Include="WeaponWeight.cs" />
     <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="Settings\Repository.json" />
     <None Include="..\README.md" />
