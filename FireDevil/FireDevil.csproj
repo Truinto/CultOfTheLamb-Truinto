@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props" Condition="Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,6 +14,8 @@
     <Deterministic>true</Deterministic>
     <LangVersion>latest</LangVersion>
     <ProjectGuid>{000603D5-05C4-43C1-AE59-C6118BC53F34}</ProjectGuid>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,7 +40,14 @@
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
-  <!-- Common references -->
+  <Target Name="Publicize" BeforeTargets="Build" AfterTargets="Clean">
+    <ItemGroup>
+      <a1 Include="$(GameManaged)\Assembly-CSharp.dll" />
+    </ItemGroup>
+    <PublicizeTask InputAssemblies="@(a1)" OutputDir="$(GameManaged)\" />
+    <!--<Message Text="Publicizing..." Importance="High" />
+    <Move SourceFiles="$(GameManaged)\Assembly-CSharp_public.dll" DestinationFiles="$(GameManaged)\Assembly-CSharp_publicized.dll" />-->
+  </Target>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,7 +61,7 @@
   <ItemGroup>
     <Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
     <Reference Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" />
-    <Reference Include="Assembly-CSharp_publicized" HintPath="$(GameManaged)\Assembly-CSharp_publicized.dll" />
+    <Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
     <Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
     <Reference Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
@@ -70,16 +80,24 @@
   <ItemGroup>
     <Compile Include="FollowerTask_Scarecrow.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Patch_Adoration.cs" />
+    <Compile Include="Patch_Demons.cs" />
+    <Compile Include="Patch_Fleece.cs" />
     <Compile Include="Patch_FollowerInfo.cs" />
     <Compile Include="Patch_GetTasks.cs" />
+    <Compile Include="Patch_Lockstate.cs" />
     <Compile Include="Patch_LumberMine.cs" />
     <Compile Include="Patch_MurderAction.cs" />
+    <Compile Include="Patch_Storages.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\BaseSettings.cs" />
     <Compile Include="Settings\ISettings.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <Compile Include="UnityHelper.cs" />
     <Compile Include="Unlocks.cs" />
     <Compile Include="WeaponWeight.cs" />
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="packages.config" />
     <None Include="Settings\Repository.json" />
     <None Include="..\README.md" />
     <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
@@ -95,4 +113,10 @@ if "$(Configuration)"=="Release" (
    echo Updated $(TargetName).zip
 )</PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props'))" />
+  </Target>
 </Project>

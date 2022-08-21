@@ -15,13 +15,19 @@ namespace FireDevil
         [JsonProperty] public bool showFollowerRole = true;
         [JsonProperty] public bool infiniteMineI = false;
         [JsonProperty] public bool infiniteMineII = true;
-        [JsonProperty] public bool globalTaskPatch = true;
+        [JsonProperty] public bool instantPickup = true;
+        [JsonProperty] public bool disableFleecePenalty = false;
+        [JsonProperty] public bool loyaltyOverflow = true;
+
+        [JsonProperty] public float storageShrine = 1.0f;
+        [JsonProperty] public float storageOuthouse = 1.0f;
+        [JsonProperty] public float storageSilo = 1.0f;
 
         protected override bool OnUpdate()
         {
             return true;
         }
 
-        public static Settings State = TryLoad(Main.Path, "settings.json");
+        public static Settings State = TryLoad(Main.ModPath, "settings.json");
     }
 }

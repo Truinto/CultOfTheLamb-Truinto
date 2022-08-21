@@ -12,9 +12,10 @@ namespace FireDevil
     {
         public static bool Prefix(FollowerLocation location, FollowerBrain __instance, ref List<FollowerTask> __result)
         {
-            if (!Settings.State.globalTaskPatch)
+            return true;
+#if !DEBUG
                 return true;
-
+#endif
             var tasks = new SortedList<float, FollowerTask>(new FollowerBrain.DuplicateKeyComparer<float>());
             foreach (var structureBrain in StructureManager.StructuresAtLocation(location))
             {

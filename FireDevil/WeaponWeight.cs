@@ -9,16 +9,18 @@ namespace FireDevil
 {
     public static class WeaponWeight
     {
-        public static IEnumerable<WeaponData> GetWeapons()
-        {
-            var data = EquipmentManager.WeaponsData;
-            if (data == null)
-                yield break;
+        private static WeaponData[] _data = Array.Empty<WeaponData>();
 
-            foreach (var weapon in data)
-            {
-                yield return weapon;
-            }
+        public static WeaponData[] GetWeapons()
+        {
+            if (_data.Length != 0)
+                return _data;
+
+            if (EquipmentManager.WeaponsData == null)
+                EquipmentManager.WeaponsData = Resources.LoadAll<WeaponData>("Data/Equipment Data/Weapons");
+
+            _data = EquipmentManager.WeaponsData.Where(w => w.EquipmentType < EquipmentType.EnemyBlast).OrderBy(o => (int)o.EquipmentType).ToArray();
+            return _data;
         }
     }
 }

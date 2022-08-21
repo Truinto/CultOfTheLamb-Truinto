@@ -37,21 +37,6 @@ namespace FireDevil
             }
         }
 
-        public static string GetGUIText(DoctrineUpgradeSystem.DoctrineType doctrine)
-        {
-            var sermonCategory = DoctrineUpgradeSystem.GetCategory(doctrine);
-            string sermon = DoctrineUpgradeSystem.GetSermonCategoryLocalizedName(sermonCategory);
-            int level = GetLevel(doctrine);
-            string unlock = DoctrineUpgradeSystem.GetUnlocked(doctrine) ? "unlocked" : "locked  ";
-            string name = DoctrineUpgradeSystem.GetLocalizedName(doctrine);
-
-            int num = name.IndexOf('>');
-            if (num > 0)
-                name = name.Substring(num + 1);
-
-            return $"{sermon, 25} {level} {unlock} - {name}";
-        }
-
         public static void ToggleUnlock(DoctrineUpgradeSystem.DoctrineType doctrine)
         {
             if (!DoctrineUpgradeSystem.GetUnlocked(doctrine))
