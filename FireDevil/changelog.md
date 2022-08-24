@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.3]
+- update to new version
+- added extra compost (grass)
+
 ## [1.0.2]
 - improved menu
 - fixed issue that would lock the cursor when using the mod manager

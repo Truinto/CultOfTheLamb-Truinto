@@ -54,6 +54,8 @@ namespace FireDevil
             return true;
         }
 
+        #region GUI
+
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
         private static GUILayoutOption DontExpand = GUILayout.ExpandWidth(false);
@@ -85,6 +87,7 @@ namespace FireDevil
                 NumberField(ref Settings.State.storageShrine, "Shrine soul maximum multiplier");
                 NumberField(ref Settings.State.storageOuthouse, "Outhouse maximum multiplier");
                 NumberField(ref Settings.State.storageSilo, "Silo maximum multiplier");
+                NumberField(ref Settings.State.extraCompost, "Extra compost multiplier");
 
                 GUILayout.Space(10);
             }
@@ -161,7 +164,7 @@ namespace FireDevil
                     GUILayout.BeginHorizontal();
 
                     GUILayout.Label(follower.Name, GUILayout.Width(150));
-                    GUILayout.Label(follower.Age.ToString(), GUILayout.Width(50));
+                    GUILayout.Label(follower.Age.ToString().ColorCond(follower.Age >= follower.LifeExpectancy, "red"), GUILayout.Width(50));
                     GUILayout.Label(follower.LifeExpectancy.ToString(), GUILayout.Width(50));
                     GUILayout.Label(follower.Adoration.ToString(), GUILayout.Width(50));
                     GUILayout.Label(follower.CursedState.ToString(), GUILayout.Width(70));
@@ -193,8 +196,9 @@ namespace FireDevil
                         follower.SkinColour = Mathf.Clamp(follower.SkinColour, 0, WorshipperData.Instance.GetColourData(follower.SkinName).StartingSlotAndColours.Count - 1);
                     });
                     GUILayout.Label(follower.SkinName.ToString(), GUILayout.Width(100));
-                    GUILayout.Label(follower.SkinVariation.ToString(), GUILayout.Width(50));
-                    GUILayout.Label(follower.SkinColour.ToString(), GUILayout.Width(50));
+                    NumberField(ref follower.SkinVariation, null, 0, WorshipperData.Instance.Characters[follower.SkinCharacter].Skin.Count - 1, 50f);
+                    NumberField(ref follower.SkinColour, null, 0, WorshipperData.Instance.GetColourData(follower.SkinName).StartingSlotAndColours.Count - 1, 50f);
+
                     if (GUILayout.Button(LastTrait == follower.ID ? "<b>▼</b> Traits" : "<b>▶</b> Traits", StyleBox, GUILayout.Width(70)))
                         LastTrait = LastTrait == follower.ID ? -1 : follower.ID;
 
@@ -315,9 +319,15 @@ namespace FireDevil
             return !flag;
         }
 
-        #region GUI
-
-
+        private static string ColorCond(this string text, bool cond, string ifTrue, string ifFalse = null)
+        {
+            if (cond)
+                return $"<color={ifTrue}>{text}</color>";
+            else if (ifFalse != null)
+                return $"<color={ifFalse}>{text}</color>";
+            else
+                return text;
+        }
 
         #endregion
 

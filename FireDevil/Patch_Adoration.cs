@@ -27,22 +27,12 @@ namespace FireDevil
             return true;
         }
 
-        [HarmonyPatch(typeof(FollowerBrainStats), nameof(FollowerBrainStats.HasGivenDiscipleReward), MethodType.Getter)]
-        [HarmonyPrefix]
-        public static void Prefix2(ref bool __result, FollowerBrainStats __instance)
-        {
-            if (Settings.State.loyaltyOverflow && __instance.HasLevelledUp)
-            {
-                __instance._info.HasGivenDiscipleReward = false;
-            }
-        }
-
         /// <summary>
         /// ignores if (this.Stats.HasLevelledUp || !DataManager.Instance.ShowLoyaltyBars)
         /// </summary>
         [HarmonyPatch(typeof(FollowerBrain), nameof(FollowerBrain.AddAdoration), typeof(Follower), typeof(FollowerBrain.AdorationActions), typeof(Action))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instr, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instr, ILGenerator generator, MethodBase original)
         {
             var code = instr as List<CodeInstruction> ?? instr.ToList();
             int index = 0;

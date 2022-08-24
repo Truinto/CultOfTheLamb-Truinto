@@ -42,7 +42,7 @@ Content
 FAQ
 -----------
 Q: My controller can't go right? \
-A: If you press F10 it opens a report box. This prevents right movement for some reason. Press F10 again to fix it. If you need to mod's menu a lot, I recommend setting a different hotkey (like F11).
+A: If you press F10 it opens a report box. This prevents right movement for some reason. Press F10 again to fix it. If you need the mod menu a lot, I recommend setting a different hotkey (like F11).
 
 Build
 -----------

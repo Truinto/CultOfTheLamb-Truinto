@@ -69,6 +69,13 @@ namespace FireDevil
             __instance.Capacity = Settings.State.storageSilo * 15f;
         }
 
+        [HarmonyPatch(typeof(Structures_CompostBin), nameof(Structures_CompostBin.AddPoop))]
+        [HarmonyPrefix]
+        public static void Compost(Structures_CompostBin __instance)
+        {
+            __instance.PoopCount += (int)(__instance.PoopToCreate * Settings.State.extraCompost);
+        }
+
 
     }
 }

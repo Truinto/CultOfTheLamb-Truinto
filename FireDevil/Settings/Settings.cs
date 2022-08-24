@@ -23,6 +23,8 @@ namespace FireDevil
         [JsonProperty] public float storageOuthouse = 1.0f;
         [JsonProperty] public float storageSilo = 1.0f;
 
+        [JsonProperty] public float extraCompost = 0.0f;
+
         protected override bool OnUpdate()
         {
             return true;
