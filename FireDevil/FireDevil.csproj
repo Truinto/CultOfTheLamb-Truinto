@@ -1,122 +1,88 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props" Condition="Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FireDevil</RootNamespace>
-    <AssemblyName>FireDevil</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <LangVersion>latest</LangVersion>
-    <ProjectGuid>{000603D5-05C4-43C1-AE59-C6118BC53F34}</ProjectGuid>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-  </PropertyGroup>
-  <Target Name="Publicize" BeforeTargets="Build" AfterTargets="Clean">
-    <ItemGroup>
-      <a1 Include="$(GameManaged)\Assembly-CSharp.dll" />
-    </ItemGroup>
-    <PublicizeTask InputAssemblies="@(a1)" OutputDir="$(GameManaged)\" />
-    <!--<Message Text="Publicizing..." Importance="High" />
-    <Move SourceFiles="$(GameManaged)\Assembly-CSharp_public.dll" DestinationFiles="$(GameManaged)\Assembly-CSharp_publicized.dll" />-->
-  </Target>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
-    <Reference Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" />
-    <Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
-    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
-    <Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
-    <Reference Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
-    <Reference Include="UnityTextMeshPro" HintPath="$(GameManaged)\Unity.TextMeshPro.dll" />
-    <Reference Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
-    <Reference Include="UnityEngine.AnimationModule" HintPath="$(GameManaged)\UnityEngine.AnimationModule.dll" />
-    <Reference Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
-    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(GameManaged)\UnityEngine.ImageConversionModule.dll" />
-    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(GameManaged)\UnityEngine.IMGUIModule.dll" />
-    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(GameManaged)\UnityEngine.JSONSerializeModule.dll" />
-    <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(GameManaged)\UnityEngine.ParticleSystemModule.dll" />
-    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
-    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
-    <Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="FollowerTask_Scarecrow.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="Patch_Adoration.cs" />
-    <Compile Include="Patch_Demons.cs" />
-    <Compile Include="Patch_Fleece.cs" />
-    <Compile Include="Patch_FollowerInfo.cs" />
-    <Compile Include="Patch_GetTasks.cs" />
-    <Compile Include="Patch_Lockstate.cs" />
-    <Compile Include="Patch_LumberMine.cs" />
-    <Compile Include="Patch_MurderAction.cs" />
-    <Compile Include="Patch_Storages.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\BaseSettings.cs" />
-    <Compile Include="Settings\ISettings.cs" />
-    <Compile Include="Settings\Settings.cs" />
-    <Compile Include="UnityHelper.cs" />
-    <Compile Include="Unlocks.cs" />
-    <Compile Include="WeaponWeight.cs" />
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-    <None Include="packages.config" />
-    <None Include="Settings\Repository.json" />
-    <None Include="..\README.md" />
-    <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy /i /e /y /f /d "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-if "$(Configuration)"=="Release" (
-   cd /d "$(ModFolder)\"
-   "C:\Program Files\7-Zip\7z.exe" u "-x!*.zip" "$(TargetName)\$(TargetName).zip" @"$(TargetName)\filelist.txt" &gt;NUL
-   echo Updated $(TargetName).zip
-)</PostBuildEvent>
-  </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props'))" />
-  </Target>
+	<PropertyGroup>
+		<Version>1.1.0</Version>
+		<TargetFramework>net48</TargetFramework>
+	</PropertyGroup>
+
+	<!-- Nuget Packages -->
+	<ItemGroup>
+		<PackageReference Include="AssemblyPublicizer" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
+	</ItemGroup>
+
+	<!-- Common References -->
+	<ItemGroup>
+		<Reference Include="System" />
+		<Reference Include="System.Core" />
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Xml.Linq" />
+		<Reference Include="System.Data.DataSetExtensions" />
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Net.Http" />
+	</ItemGroup>
+
+	<!-- Project References -->
+	<ItemGroup>
+		<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
+		<Reference Private="false" Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" />
+		<Reference Private="false" Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
+		<Reference Private="false" Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
+		<Reference Private="false" Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
+		<Reference Private="false" Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
+		<Reference Private="false" Include="UnityTextMeshPro" HintPath="$(GameManaged)\Unity.TextMeshPro.dll" />
+		<Reference Private="false" Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
+		<Reference Private="false" Include="UnityEngine.AnimationModule" HintPath="$(GameManaged)\UnityEngine.AnimationModule.dll" />
+		<Reference Private="false" Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
+		<Reference Private="false" Include="UnityEngine.ImageConversionModule" HintPath="$(GameManaged)\UnityEngine.ImageConversionModule.dll" />
+		<Reference Private="false" Include="UnityEngine.IMGUIModule" HintPath="$(GameManaged)\UnityEngine.IMGUIModule.dll" />
+		<Reference Private="false" Include="UnityEngine.JSONSerializeModule" HintPath="$(GameManaged)\UnityEngine.JSONSerializeModule.dll" />
+		<Reference Private="false" Include="UnityEngine.ParticleSystemModule" HintPath="$(GameManaged)\UnityEngine.ParticleSystemModule.dll" />
+		<Reference Private="false" Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
+		<Reference Private="false" Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Private="false" Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
+	</ItemGroup>
+	
+	<!-- Other Files -->
+	<ItemGroup>	
+		<None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<!-- Publicize -->
+	<Target Name="Publicize" BeforeTargets="Clean;BeforeBuild" AfterTargets="">
+		<ItemGroup>
+			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
+		</ItemGroup>
+		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(GameManaged)\" />
+	</Target>
+
+	<!-- Update build version -->
+	<Target Name="Versioning" BeforeTargets="BeforeBuild">
+		<ItemGroup>
+			<_VersioningIn Include="$(MSBuildThisFileFullPath)" />
+			<_VersioningIn Include="changelog.md" />
+			<_VersioningOut Include="$(MSBuildThisFileFullPath)" />
+			<_VersioningOut Include="info.json" />
+			<_VersioningOut Include="Settings\Repository.json" Max="2" />
+		</ItemGroup>
+		<VersioningTask InputFiles="@(_VersioningIn)" UpdateFiles="@(_VersioningOut)" MaxMatch="1" TouchFiles="false" />
+	</Target>
+
+	<!-- Copy to mod folder -->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<ItemGroup>
+			<_CopyItems Include="$(TargetDir)\*" />
+
+			<_Zip Include="$(ModFolder)\$(TargetName)\info.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\changelog.md" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\FireDevil.dll" />
+		</ItemGroup>
+		
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
+		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\$(TargetName)\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
+		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
+	</Target>
+
 </Project>

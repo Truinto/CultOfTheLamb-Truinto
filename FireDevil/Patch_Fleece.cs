@@ -15,7 +15,7 @@ namespace FireDevil
         {
             int playerFleece = DataManager.Instance.PlayerFleece;
             if (playerFleece == 2)
-                __result = 2f;
+                __result = 1f; // this does nothing
         }
 
         [HarmonyPatch(typeof(PlayerFleeceManager), nameof(PlayerFleeceManager.GetDamageReceivedMultiplier))]
@@ -31,7 +31,7 @@ namespace FireDevil
         public static void Postfix3(ref float __result)
         {
             if (!Settings.State.disableFleecePenalty) return;
-            __result = 0f;
+            __result = 0f; // this does nothing
         }
 
         [HarmonyPatch(typeof(DataManager), nameof(DataManager.SetNewRun))]

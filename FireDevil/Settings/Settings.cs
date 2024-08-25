@@ -9,7 +9,7 @@ namespace FireDevil
 {
     public class Settings : BaseSettings<Settings>
     {
-        public Settings() => version = 1;
+        public Settings() => version = 2;
 
         [JsonProperty] public bool showMurderAction = true;
         [JsonProperty] public bool showFollowerRole = true;
@@ -19,11 +19,15 @@ namespace FireDevil
         [JsonProperty] public bool disableFleecePenalty = false;
         [JsonProperty] public bool loyaltyOverflow = true;
 
-        [JsonProperty] public float storageShrine = 1.0f;
-        [JsonProperty] public float storageOuthouse = 1.0f;
-        [JsonProperty] public float storageSilo = 1.0f;
+        [JsonProperty] public float storageShrineMult = 1.0f;
+        [JsonProperty] public float storageOuthouseMult = 1.0f;
+        [JsonProperty] public float storageSiloMult = 1.0f;
 
-        [JsonProperty] public float extraCompost = 0.0f;
+        [JsonProperty] public float compostMult = 1.0f;
+        [JsonProperty] public float ritualCostMult = 0.5f;
+        [JsonProperty] public float ritualCooldownMult = 0.5f;
+
+        [JsonProperty] public float harvestTotemRadius = 7f;
 
         protected override bool OnUpdate()
         {

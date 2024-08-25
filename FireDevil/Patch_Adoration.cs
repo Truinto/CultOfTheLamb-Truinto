@@ -19,19 +19,17 @@ namespace FireDevil
             if (value == 0f && __instance._info.Adoration > 100f)
             {
                 __instance._info.Adoration -= 100f;
-
-
-
                 return false;
             }
             return true;
         }
 
+        // TODO: fix bug
         /// <summary>
         /// ignores if (this.Stats.HasLevelledUp || !DataManager.Instance.ShowLoyaltyBars)
         /// </summary>
-        [HarmonyPatch(typeof(FollowerBrain), nameof(FollowerBrain.AddAdoration), typeof(Follower), typeof(FollowerBrain.AdorationActions), typeof(Action))]
-        [HarmonyTranspiler]
+        //[HarmonyPatch(typeof(FollowerBrain), nameof(FollowerBrain.AddAdoration), typeof(Follower), typeof(FollowerBrain.AdorationActions), typeof(Action))]
+        //[HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instr, ILGenerator generator, MethodBase original)
         {
             var code = instr as List<CodeInstruction> ?? instr.ToList();

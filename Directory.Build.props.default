@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <PropertyGroup>
-    <GOGFolder>D:\Programme\GOG Galaxy\Games\</GOGFolder>
-    <GameManaged Condition="Exists('$(GOGFolder)')">$(GOGFolder)Cult of the Lamb\Cult Of The Lamb_Data\Managed</GameManaged>
-    <GameManaged Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\Cult sources\Cult Of The Lamb_Data\Managed</GameManaged>
-    <ModFolder Condition="Exists('$(GOGFolder)')">$(GOGFolder)Cult of the Lamb\Mods</ModFolder>
-    <ModFolder Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\Cult sources\</ModFolder>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Zip7>C:\Program Files\7-Zip\7z.exe</Zip7>
+		<ProgramFolder>D:\Programme\GOG Galaxy\Games\</ProgramFolder>
+		<GameManaged>$(ProgramFolder)Cult of the Lamb\Cult Of The Lamb_Data\Managed</GameManaged>
+		<GameManaged Condition="!Exists('$(GameManaged)')">..\..\..\@non-backup\Cult sources\Cult Of The Lamb_Data\Managed</GameManaged>
+		<ModFolder>$(ProgramFolder)Cult of the Lamb\Mods</ModFolder>
+		<ModFolder Condition="!Exists('$(ModFolder)')">..\..\..\@non-backup\Cult sources\</ModFolder>
+	</PropertyGroup>
 </Project>

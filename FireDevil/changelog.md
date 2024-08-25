@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.0]
+- update to version 1.4.3.228
+- removed some broken features
+
 ## [1.0.3]
 - update to new version
 - added extra compost (grass)

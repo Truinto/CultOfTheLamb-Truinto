@@ -13,14 +13,14 @@ namespace FireDevil
         [HarmonyPostfix]
         public static void Postfix1(ref int __result)
         {
-            __result = (int)(__result * Settings.State.storageShrine);
+            __result = (int)(__result * Settings.State.storageShrineMult);
         }
 
         [HarmonyPatch(typeof(Structures_Outhouse), nameof(Structures_Outhouse.Capacity))]
         [HarmonyPostfix]
         public static void Postfix2(ref int __result)
         {
-            __result = (int)(__result * Settings.State.storageOuthouse);
+            __result = (int)(__result * Settings.State.storageOuthouseMult);
         }
 
         [HarmonyPatch(typeof(LumberjackStation), nameof(LumberjackStation.Update))]
@@ -41,39 +41,25 @@ namespace FireDevil
         }
 
 
-        [HarmonyPatch(typeof(Interaction_SiloSeeder), nameof(Interaction_SiloSeeder.OnInteract))]
+        [HarmonyPatch(typeof(Structures_SiloSeed), nameof(Structures_SiloSeed.Capacity), MethodType.Getter)]
         [HarmonyPrefix]
-        public static void Silo1(Interaction_SiloSeeder __instance)
+        public static void Silo1(ref float __result)
         {
-            __instance.StructureBrain.Capacity = Settings.State.storageSilo * 15f;
+            __result *= Settings.State.storageSiloMult;
         }
 
-        [HarmonyPatch(typeof(Interaction_SiloFertilizer), nameof(Interaction_SiloFertilizer.OnInteract))]
+        [HarmonyPatch(typeof(Structures_SiloFertiliser), nameof(Structures_SiloFertiliser.Capacity), MethodType.Getter)]
         [HarmonyPrefix]
-        public static void Silo2(Interaction_SiloFertilizer __instance)
+        public static void Silo2(ref float __result)
         {
-            __instance.StructureBrain.Capacity = Settings.State.storageSilo * 15f;
+            __result *= Settings.State.storageSiloMult;
         }
 
-        [HarmonyPatch(typeof(Structures_SiloSeed), MethodType.Constructor)]
-        [HarmonyPostfix]
-        public static void Silo3(Structures_SiloSeed __instance)
-        {
-            __instance.Capacity = Settings.State.storageSilo * 15f;
-        }
-
-        [HarmonyPatch(typeof(Structures_SiloFertiliser), MethodType.Constructor)]
-        [HarmonyPostfix]
-        public static void Silo4(Structures_SiloFertiliser __instance)
-        {
-            __instance.Capacity = Settings.State.storageSilo * 15f;
-        }
-
-        [HarmonyPatch(typeof(Structures_CompostBin), nameof(Structures_CompostBin.AddPoop))]
+        [HarmonyPatch(typeof(Structures_CompostBin), nameof(Structures_CompostBin.AddPoop), typeof(int))]
         [HarmonyPrefix]
-        public static void Compost(Structures_CompostBin __instance)
+        public static void Compost(ref int amount)
         {
-            __instance.PoopCount += (int)(__instance.PoopToCreate * Settings.State.extraCompost);
+            amount = (int)(amount * Settings.State.compostMult);
         }
 
 
