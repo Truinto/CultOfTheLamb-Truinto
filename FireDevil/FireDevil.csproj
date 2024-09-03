@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.1.1</Version>
+		<Version>2.0.1</Version>
 		<TargetFramework>net48</TargetFramework>
 		<Configurations>Debug;Release;Release_Bep</Configurations>
 	</PropertyGroup>
@@ -11,7 +11,7 @@
 		<When Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(Configuration), '^.*_Bep$' ))">
 			<PropertyGroup>
 				<DefineConstants>$(DefineConstants);BEPINEX</DefineConstants>
-				<OutputPath>$(OutputPath)_Bep\</OutputPath>
+				<OutputPath>bin\Bep\</OutputPath>
 			</PropertyGroup>
 			<ItemGroup>
 			</ItemGroup>
@@ -108,12 +108,19 @@
 			<_Zip Include="$(ModFolder)\$(TargetName)\info.json" />
 			<_Zip Include="$(ModFolder)\$(TargetName)\changelog.md" />
 			<_Zip Include="$(ModFolder)\$(TargetName)\FireDevil.dll" />
+			
+			<_Zip_Bep Include="$(GameManaged)\..\..\BepInEx\plugins\$(TargetName)\FireDevil.dll" />
 		</ItemGroup>
 
-		<ILRepack XmlDocumentation="true" Union="true" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
+		<ILRepack Condition="'$(Configuration)'!='Release_Bep'" XmlDocumentation="true" Union="true" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
+		<Copy Condition="'$(Configuration)'!='Release_Bep'" SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
 		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\$(TargetName)\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
+
+		<ILRepack Condition="'$(Configuration)'=='Release_Bep'" XmlDocumentation="true" Union="true" LibraryPath="$(GameManaged);$(GameManaged)\..\..\BepInEx\core" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
+		<Copy Condition="'$(Configuration)'=='Release_Bep'" SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(GameManaged)\..\..\BepInEx\plugins\$(TargetName)\" />
+		<ZipTask Condition="'$(Configuration)'=='Release_Bep'" ZipFileName="$(ModFolder)\$(TargetName)\$(TargetName)_BepInEx.zip" WorkingDirectory="$(GameManaged)\..\..\BepInEx\plugins" Files="@(_Zip_Bep)" />
+		<Message Condition="'$(Configuration)'=='Release_Bep'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>
 
 </Project>

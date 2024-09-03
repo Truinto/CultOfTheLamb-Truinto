@@ -10,13 +10,14 @@ namespace FireDevil
     {
         public Settings() => version = 4;
 
-        [JsonProperty] public bool hideNecklaceAction = true;
+        [JsonProperty] public bool hideNecklaceAction = false;
         [JsonProperty] public bool autoAddCookingTask = true;
         [JsonProperty] public bool showMurderAction = true;
         [JsonProperty] public bool showFollowerRole = true;
         [JsonProperty] public bool infiniteMineI = false;
         [JsonProperty] public bool infiniteMineII = true;
         [JsonProperty] public bool instantPickup = true;
+        [JsonProperty] public bool redirectPlayerInventory = true;
         [JsonProperty] public bool disableFleecePenalty = false;
         [JsonProperty] public bool loyaltyOverflow = true;
         [JsonProperty] public bool freeHeavyAttack = true;

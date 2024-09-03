@@ -10,6 +10,11 @@ namespace FireDevil
     [HarmonyPatch]
     public static class Patch_Cooking
     {
+        public static void OnLoad()
+        {
+            _ = Recipes;
+        }
+
         /// <summary>
         /// Remove max from satiation clamp.
         /// </summary>

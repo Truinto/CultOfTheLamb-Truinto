@@ -1,4 +1,4 @@
-﻿global using HarmonyLib;
+global using HarmonyLib;
 global using Newtonsoft.Json;
 global using System;
 global using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace FireDevil
     public static class Main
     {
         #region Fields
-        public const string version = "2.0.0";
+        public const string version = "2.0.1";
         internal static ILogger logger;
         public static string ModPath;
         public static Harmony harmony;
@@ -41,7 +41,7 @@ namespace FireDevil
             PatchSafe(typeof(Patch_Storages));
             PatchSafe(typeof(Patch_Adoration));
             PatchSafe(typeof(Patch_RitualCost));
-            PatchSafe(typeof(Patch_Age));
+            PatchSafe(typeof(TimeManagment));
             PatchSafe(typeof(Patch_Farming));
             PatchSafe(typeof(Patch_Farming2));
             PatchSafe(typeof(Patch_Farming3));
@@ -58,8 +58,9 @@ namespace FireDevil
                 }
             }
 #endif
-            CallSafe(() => _ = Patch_Cooking.Recipes); // init static array
-            UpdateStaticSettings();
+            CallSafe(Patch_Cooking.OnLoad);
+            CallSafe(TimeManagment.OnLoad);
+            CallSafe(UpdateStaticSettings);
         }
 
         public static void UpdateStaticSettings()
@@ -115,7 +116,7 @@ namespace FireDevil
 
         #endregion
     }
-
+#if UMM
     public static class Main_UMM
     {
         public static bool Load(UnityModManager.ModEntry modEntry)
@@ -160,6 +161,7 @@ namespace FireDevil
                 Checkbox(ref Settings.State.infiniteMineI, "Infinite Lumber and Stone Mine");
                 Checkbox(ref Settings.State.infiniteMineII, "Infinite Lumber and Stone Mine Level 2");
                 Checkbox(ref Settings.State.instantPickup, "Instantly pickup mine resources");
+                Checkbox(ref Settings.State.redirectPlayerInventory, "Redirect items to player inventory (farm, refinery)");
                 Checkbox(ref Settings.State.disableFleecePenalty, "Disable most fleece penalties");
                 Checkbox(ref Settings.State.loyaltyOverflow, "Allow follower loyalty overflow to next level");
                 Checkbox(ref Settings.State.freeHeavyAttack, "Heavy attacks consume no fervour");
@@ -507,8 +509,8 @@ namespace FireDevil
                 return text;
         }
     }
-
-    [BepInPlugin("Truinto.FireDevil", "Fire Devil", Main.version)]
+#elif BEPINEX
+    [BepInPlugin("Truinto.FireDevil", "FireDevil", Main.version)]
     public class Main_Bep : BaseUnityPlugin
     {
         public void Awake()
@@ -520,4 +522,5 @@ namespace FireDevil
             Main.Print($"FireDevil is loaded!");
         }
     }
+#endif
 }

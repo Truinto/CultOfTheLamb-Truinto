@@ -9,6 +9,11 @@ using BepInEx.Logging;
 
 namespace FireDevil
 {
+    public interface ILogger
+    {
+        public abstract void Log(string message);
+    }
+#if UMM
     public class Logger_UMM : ILogger
     {
         private UnityModManager.ModEntry.ModLogger logger;
@@ -23,7 +28,7 @@ namespace FireDevil
             logger.Log(message);
         }
     }
-
+#elif BEPINEX
     public class Logger_Bep : ILogger
     {
         private ManualLogSource logger;
@@ -38,9 +43,5 @@ namespace FireDevil
             logger.Log(LogLevel.Debug, message);
         }
     }
-
-    public interface ILogger
-    {
-        public abstract void Log(string message);
-    }
+#endif
 }

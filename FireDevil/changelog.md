@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.0.1]
+- add option to redirect items to player inventory
+
 ## [2.0.0]
 - added option composter cost
 - readded adoration overflow

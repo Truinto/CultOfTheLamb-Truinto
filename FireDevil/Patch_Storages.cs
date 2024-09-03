@@ -9,6 +9,23 @@ namespace FireDevil
     [HarmonyPatch]
     public static class Patch_Storages
     {
+        /// <summary>
+        /// Stores items directly to player inventory, instead of structure inventory.
+        /// </summary>
+        [HarmonyPatch(typeof(StructureBrain), nameof(StructureBrain.DepositItem))]
+        public static bool Prefix_RedirectPlayerInventory(InventoryItem.ITEM_TYPE type, int quantity, StructureBrain __instance)
+        {
+            if (!Settings.State.redirectPlayerInventory)
+                return true;
+
+            if (__instance is Structures_FarmerStation or Structures_Refinery or Structures_OfferingShrine)
+            {
+                Inventory.AddItem((int)type, quantity, true);
+                return false;
+            }
+            return true;
+        }
+
         [HarmonyPatch(typeof(Structures_Shrine), nameof(Structures_Shrine.SoulMax), MethodType.Getter)]
         [HarmonyPostfix]
         public static void Postfix1(ref int __result)
