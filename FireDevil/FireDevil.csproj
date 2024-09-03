@@ -14,8 +14,6 @@
 				<OutputPath>$(OutputPath)_Bep\</OutputPath>
 			</PropertyGroup>
 			<ItemGroup>
-				<!-- Condition="$(DefineConstants.Contains(BEPINEX))" -->
-				<Reference Private="false" Include="BepInEx" HintPath="$(GameManaged)\..\..\BepInEx\core\BepInEx.dll" />
 			</ItemGroup>
 		</When>
 		<Otherwise>
@@ -23,7 +21,6 @@
 				<DefineConstants>$(DefineConstants);UMM</DefineConstants>
 			</PropertyGroup>
 			<ItemGroup>
-				<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
 			</ItemGroup>
 		</Otherwise>
 	</Choose>
@@ -49,6 +46,9 @@
 
 	<!-- Project References -->
 	<ItemGroup>
+		<Reference Private="false" Include="BepInEx" HintPath="$(GameManaged)\..\..\BepInEx\core\BepInEx.dll" />
+		<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
+		
 		<Reference Private="false" Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" />
 		<Reference Private="false" Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
 		<Reference Private="false" Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />

@@ -8,5 +8,5 @@
   "AssemblyName": "FireDevil.dll",
   "HomePage": "https://github.com/Truinto/CultOfTheLamb-Truinto/releases",
   "Repository": "https://raw.githubusercontent.com/Truinto/CultOfTheLamb-Truinto/master/FireDevil/Settings/Repository.json",
-  "EntryMethod": "FireDevil.Main.LoadUMM"
+  "EntryMethod": "FireDevil.Main_UMM.Load"
 }

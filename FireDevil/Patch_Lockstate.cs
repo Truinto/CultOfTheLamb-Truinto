@@ -1,9 +1,10 @@
-﻿#if UMM
-
-using UnityModManagerNet;
+﻿using UnityModManagerNet;
 
 namespace FireDevil
 {
+    /// <summary>
+    /// Fix for UMM menu UI.
+    /// </summary>
     [HarmonyPatch(typeof(UnityModManager.UI), nameof(UnityModManager.UI.ToggleWindow), typeof(bool))]
     public static class Patch_Lockstate
     {
@@ -20,5 +21,3 @@ namespace FireDevil
         }
     }
 }
-
-#endif

@@ -8,26 +8,18 @@ global using System.Reflection.Emit;
 global using UnityEngine;
 using System.IO;
 using System.Text.RegularExpressions;
-
-#if UMM
 using UnityModManagerNet;
-#endif
-#if BEPINEX
 using BepInEx;
-#endif
 
 namespace FireDevil
 {
-#if BEPINEX
-    [BepInPlugin("Truinto.FireDevil", "Fire Devil", "2.0.0")]
-    public class Main : BaseUnityPlugin
-#else
     public static class Main
-#endif
     {
         #region Fields
+        public const string version = "2.0.0";
+        internal static ILogger logger;
         public static string ModPath;
-        private static Harmony harmony;
+        public static Harmony harmony;
 
         private static FieldInfo IntRange_Min = typeof(IntRange).GetField("<Min>k__BackingField", AccessTools.all);
         private static FieldInfo IntRange_Max = typeof(IntRange).GetField("<Max>k__BackingField", AccessTools.all);
@@ -66,7 +58,7 @@ namespace FireDevil
                 }
             }
 #endif
-            CallSafe(() => _ = Patch_Cooking.Recipes);
+            CallSafe(() => _ = Patch_Cooking.Recipes); // init static array
             UpdateStaticSettings();
         }
 
@@ -79,23 +71,64 @@ namespace FireDevil
             //IntRange_Max?.SetValue(MissionaryManager.SeedRange, 16);
         }
 
-        #region UnityModManager
-#if UMM
+        #region Helper
 
-        private static UnityModManager.ModEntry.ModLogger logger;
-
-        public static bool LoadUMM(UnityModManager.ModEntry modEntry)
+        public static void Print(string msg)
         {
-            logger = modEntry.Logger;
-            ModPath = modEntry.Path;
-            harmony = new(modEntry.Info.Id);
+            logger?.Log(msg);
+        }
 
+        internal static void PatchSafe(Type patch)
+        {
+            try
+            {
+                Print("Patching " + patch.Name);
+                harmony.CreateClassProcessor(patch).Patch();
+            }
+            catch (Exception e) { Print(e.ToString()); }
+        }
+
+        internal static void CallSafe(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e) { Print(e.ToString()); }
+        }
+
+        internal static Exception NullFinalizer(Exception __exception)
+        {
+#if !DEBUG
+            return null;
+#else
+            if (__exception == null)
+                return null;
+            try
+            {
+                Print(__exception.ToString());
+            }
+            catch (Exception) { }
+            return null;
+#endif
+        }
+
+        #endregion
+    }
+
+    public static class Main_UMM
+    {
+        public static bool Load(UnityModManager.ModEntry modEntry)
+        {
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnHideGUI = OnHideGUI;
-            
-            PatchSafe(typeof(Patch_Lockstate));
-            Load();
+
+            Main.logger = new Logger_UMM(modEntry.Logger);
+            Main.ModPath = modEntry.Path;
+
+            Main.PatchSafe(typeof(Patch_Lockstate));
+            Main.Load();
 
             return true;
         }
@@ -140,8 +173,8 @@ namespace FireDevil
                 NumberField(ref Settings.State.compostCost, "Compost cost (grass)");
                 NumberField(ref Settings.State.ritualCostMult, "Ritual cost multiplier");
                 NumberField(ref Settings.State.ritualCooldownMult, "Ritual cooldown multiplier");
-                NumberField(ref Settings.State.harvestTotemRadius, "Harvest Totem radius", 100f, UpdateStaticSettings);
-                NumberField(ref Settings.State.propagandaSpeakerRadius, "Propaganda Speaker radius", 100f, UpdateStaticSettings);
+                NumberField(ref Settings.State.harvestTotemRadius, "Harvest Totem radius", 100f, Main.UpdateStaticSettings);
+                NumberField(ref Settings.State.propagandaSpeakerRadius, "Propaganda Speaker radius", 100f, Main.UpdateStaticSettings);
                 NumberField(ref Settings.State.farmStationRadius, "Farm Station radius", 100f);
 
                 GUILayout.Space(10);
@@ -371,9 +404,9 @@ namespace FireDevil
                     }
 
                     foreach (var kitchen in Interaction_Kitchen.Kitchens)
-                        Print("kitchen: " + kitchen.structure.Structure_Info.ID);
+                        Main.Print("kitchen: " + kitchen.structure.Structure_Info.ID);
                 }
-                catch (Exception e) { PrintException(e); }
+                catch (Exception e) { Main.Print(e.ToString()); }
             }
             if (GUILayout.Button("Debug +1000 gold", DontExpand))
             {
@@ -473,77 +506,18 @@ namespace FireDevil
             else
                 return text;
         }
-#endif
-        #endregion
+    }
 
-        #region BepInEx
-#if BEPINEX
-        internal static BepInEx.Logging.ManualLogSource logger;
+    [BepInPlugin("Truinto.FireDevil", "Fire Devil", Main.version)]
+    public class Main_Bep : BaseUnityPlugin
+    {
         public void Awake()
         {
-            logger = this.Logger;
-            ModPath = Path.GetDirectoryName(this.Info.Location);
-            Load();
-            logger.LogInfo($"FireDevil is loaded!");
+            Main.logger = new Logger_Bep(this.Logger);
+            Main.ModPath = Path.GetDirectoryName(this.Info.Location);
+
+            Main.Load();
+            Main.Print($"FireDevil is loaded!");
         }
-#endif
-        #endregion
-
-        #region Helper
-
-        internal static void Print(string msg)
-        {
-#if BEPINEX
-            logger.LogDebug(msg);
-#else
-            logger.Log(msg);
-#endif
-        }
-
-        internal static void PrintException(Exception e)
-        {
-#if BEPINEX
-            logger.LogError(e);
-#else
-            logger.LogException(e);
-#endif
-        }
-
-        internal static void PatchSafe(Type patch)
-        {
-            try
-            {
-                Print("Patching " + patch.Name);
-                harmony.CreateClassProcessor(patch).Patch();
-            }
-            catch (Exception e) { PrintException(e); }
-        }
-
-        internal static void CallSafe(Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e) { PrintException(e); }
-        }
-
-        internal static Exception NullFinalizer(Exception __exception)
-        {
-#if !DEBUG
-            return null;
-#else
-            if (__exception == null)
-                return null;
-            try
-            {
-                PrintException(__exception);
-            }
-            catch (Exception) { }
-            return null;
-#endif
-        }
-
-        #endregion
     }
 }
