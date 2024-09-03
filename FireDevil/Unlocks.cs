@@ -35,6 +35,11 @@ namespace FireDevil
                 yield return DoctrineUpgradeSystem.GetSermonReward(SermonCategory.WorkAndWorship, i, true);
                 yield return DoctrineUpgradeSystem.GetSermonReward(SermonCategory.WorkAndWorship, i, false);
             }
+            for (int i = 1; i <= 4; i++)
+            {
+                yield return DoctrineUpgradeSystem.GetSermonReward(SermonCategory.Pleasure, i, true);
+                yield return DoctrineUpgradeSystem.GetSermonReward(SermonCategory.Pleasure, i, false);
+            }
         }
 
         public static void ToggleUnlock(DoctrineUpgradeSystem.DoctrineType doctrine)
@@ -42,9 +47,9 @@ namespace FireDevil
             if (!DoctrineUpgradeSystem.GetUnlocked(doctrine))
             {
                 DoctrineUpgradeSystem.UnlockAbility(doctrine);
-                var alt = GetAlternative(doctrine);
-                if (DoctrineUpgradeSystem.GetUnlocked(alt))
-                    ToggleUnlock(alt);
+                //var alt = GetAlternative(doctrine);
+                //if (DoctrineUpgradeSystem.GetUnlocked(alt))
+                //    ToggleUnlock(alt);
             }
             else
             {
@@ -52,37 +57,12 @@ namespace FireDevil
 
                 switch (doctrine)
                 {
-                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_FasterBuilding:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_FasterBuilding);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_Enlightenment:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Enlightenment);
-                        break;
-
                     case DoctrineUpgradeSystem.DoctrineType.WorkWorship_FaithfulTrait:
                         RemoveAddCultTrait(FollowerTrait.TraitType.Faithful);
                         break;
 
                     case DoctrineUpgradeSystem.DoctrineType.WorkWorship_GoodWorkerTrait:
                         RemoveAddCultTrait(FollowerTrait.TraitType.Industrious);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_WorkThroughNightRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_WorkThroughNight);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_HolidayRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Holiday);
-                        JudgementMeter.ShowModify(-1);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Possessions_MoreFaithFromHomes:
-                        RemoveAddCultTrait(FollowerTrait.TraitType.ConstructionEnthusiast);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Possessions_MoreFaithFromRituals:
-                        RemoveAddCultTrait(FollowerTrait.TraitType.SermonEnthusiast);
                         break;
 
                     case DoctrineUpgradeSystem.DoctrineType.Possessions_TraitMaterialistic:
@@ -93,30 +73,12 @@ namespace FireDevil
                         RemoveAddCultTrait(FollowerTrait.TraitType.FalseIdols);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.Possessions_AlmsToPoorRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_AlmsToPoor);
+                    case DoctrineUpgradeSystem.DoctrineType.Possessions_MoreFaithFromHomes:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.ConstructionEnthusiast);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.Possessions_DonationRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_DonationRitual);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_Fast:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Fast);
-                        JudgementMeter.ShowModify(1);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_Feast:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Feast);
-                        JudgementMeter.ShowModify(-1);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitMushroomEncouraged:
-                        RemoveAddCultTrait(FollowerTrait.TraitType.MushroomEncouraged);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitMushroomBanned:
-                        RemoveAddCultTrait(FollowerTrait.TraitType.MushroomBanned);
+                    case DoctrineUpgradeSystem.DoctrineType.Possessions_MoreFaithFromRituals:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.SermonEnthusiast);
                         break;
 
                     case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitCannibal:
@@ -129,14 +91,6 @@ namespace FireDevil
                         JudgementMeter.ShowModify(-1);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitHarvestRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_HarvestRitual);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitFishingRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_FishingRitual);
-                        break;
-
                     case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_TraitSacrificeEnthusiast:
                         RemoveAddCultTrait(FollowerTrait.TraitType.SacrificeEnthusiast);
                         break;
@@ -145,13 +99,21 @@ namespace FireDevil
                         RemoveAddCultTrait(FollowerTrait.TraitType.DesensitisedToDeath);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_RessurectionRitual:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Ressurect);
+                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitMushroomEncouraged:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.MushroomEncouraged);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitMushroomBanned:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.MushroomBanned);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_TraitDisciplinarian:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.Disciplinarian);
                         JudgementMeter.ShowModify(1);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_Funeral:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Funeral);
+                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_TraitLibertarian:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.Libertarian);
                         JudgementMeter.ShowModify(-1);
                         break;
 
@@ -165,23 +127,60 @@ namespace FireDevil
                         JudgementMeter.ShowModify(1);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_BuildingReturnToEarth:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Building_NaturalBurial);
-                        JudgementMeter.ShowModify(1);
+                    case DoctrineUpgradeSystem.DoctrineType.Special_Sacrifice:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Sacrifice);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_BuildingGoodGraves:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Building_Graves);
-                        JudgementMeter.ShowModify(-1);
+                    case DoctrineUpgradeSystem.DoctrineType.Special_Bonfire:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_FirePit);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_MurderFollower:
-                        JudgementMeter.ShowModify(1);
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Purge:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Purge);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_AscendFollower:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Ascend);
-                        JudgementMeter.ShowModify(-1);
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Nudist:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Nudism);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Special_BecomeDisciple:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_BecomeDisciple);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Cannibal:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Cannibal);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_AtoneSin:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_AtoneSin);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Allegiance:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.Allegiance);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Fertility:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.Fertility);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Doctrinal_Extremist:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.DoctrinalExtremist);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Pleasure_Violent_Extremist:
+                        RemoveAddCultTrait(FollowerTrait.TraitType.ViolentExtremist);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Special_ReadMind:
+                        DataManager.Instance.CanReadMinds = false;
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Special_Brainwashed:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Brainwashing);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Special_Consume:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_ConsumeFollower);
                         break;
 
                     case DoctrineUpgradeSystem.DoctrineType.LawOrder_FightPitRitual:
@@ -194,6 +193,59 @@ namespace FireDevil
                         JudgementMeter.ShowModify(-1);
                         break;
 
+                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_FasterBuilding:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_FasterBuilding);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_Fast:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Fast);
+                        JudgementMeter.ShowModify(1);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_Feast:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Feast);
+                        JudgementMeter.ShowModify(-1);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_Enlightenment:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Enlightenment);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_WorkThroughNightRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_WorkThroughNight);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.WorkWorship_HolidayRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Holiday);
+                        JudgementMeter.ShowModify(-1);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitFishingRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_FishingRitual);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Sustenance_TraitHarvestRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_HarvestRitual);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Possessions_AlmsToPoorRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_AlmsToPoor);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.Possessions_DonationRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_DonationRitual);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_Funeral:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Funeral);
+                        JudgementMeter.ShowModify(-1);
+                        break;
+
+                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_RessurectionRitual:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Ressurect);
+                        JudgementMeter.ShowModify(1);
+                        break;
+
                     case DoctrineUpgradeSystem.DoctrineType.LawOrder_AssignFaithEnforcerRitual:
                         RemoveUnlockAbility(UpgradeSystem.Type.Ritual_AssignFaithEnforcer);
                         break;
@@ -202,34 +254,23 @@ namespace FireDevil
                         RemoveUnlockAbility(UpgradeSystem.Type.Ritual_AssignTaxCollector);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_TraitDisciplinarian:
-                        RemoveAddCultTrait(FollowerTrait.TraitType.Disciplinarian);
-                        JudgementMeter.ShowModify(1);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_TraitLibertarian:
-                        RemoveAddCultTrait(FollowerTrait.TraitType.Libertarian);
+                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_AscendFollower:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Ascend);
                         JudgementMeter.ShowModify(-1);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.Special_Brainwashed:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Brainwashing);
+                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_BuildingGoodGraves:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Building_Graves);
+                        JudgementMeter.ShowModify(-1);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.Special_Sacrifice:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_Sacrifice);
+                    case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_BuildingReturnToEarth:
+                        RemoveUnlockAbility(UpgradeSystem.Type.Building_NaturalBurial);
+                        JudgementMeter.ShowModify(1);
                         break;
 
-                    case DoctrineUpgradeSystem.DoctrineType.Special_Consume:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_ConsumeFollower);
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Special_ReadMind:
-                        DataManager.Instance.CanReadMinds = false;
-                        break;
-
-                    case DoctrineUpgradeSystem.DoctrineType.Special_Bonfire:
-                        RemoveUnlockAbility(UpgradeSystem.Type.Ritual_FirePit);
+                    case DoctrineUpgradeSystem.DoctrineType.LawOrder_MurderFollower:
+                        JudgementMeter.ShowModify(1);
                         break;
                 }
             }
@@ -259,6 +300,8 @@ namespace FireDevil
                 case DoctrineUpgradeSystem.DoctrineType.Possessions_Bribe:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_FaithfulTrait:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_GoodWorkerTrait:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Purge:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Nudist:
                     return 1;
 
                 case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_RessurectionRitual:
@@ -271,6 +314,8 @@ namespace FireDevil
                 case DoctrineUpgradeSystem.DoctrineType.Possessions_TraitFalseIdols:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_Inspire:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_Intimidate:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Cannibal:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_AtoneSin:
                     return 2;
 
                 case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_TraitRespectElders:
@@ -283,6 +328,8 @@ namespace FireDevil
                 case DoctrineUpgradeSystem.DoctrineType.Possessions_DonationRitual:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_FasterBuilding:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_Enlightenment:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Violent_Extremist:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Doctrinal_Extremist:
                     return 3;
 
                 case DoctrineUpgradeSystem.DoctrineType.DeathSacrifice_BuildingReturnToEarth:
@@ -295,13 +342,15 @@ namespace FireDevil
                 case DoctrineUpgradeSystem.DoctrineType.Possessions_MoreFaithFromRituals:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_WorkThroughNightRitual:
                 case DoctrineUpgradeSystem.DoctrineType.WorkWorship_HolidayRitual:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Allegiance:
+                case DoctrineUpgradeSystem.DoctrineType.Pleasure_Fertility:
                     return 4;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return 0;
             }
         }
-    
+
         public static DoctrineUpgradeSystem.DoctrineType GetAlternative(DoctrineUpgradeSystem.DoctrineType doctrine)
         {
             var sermon = DoctrineUpgradeSystem.GetCategory(doctrine);

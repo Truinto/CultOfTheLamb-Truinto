@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Shared
+namespace FireDevil
 {
     public abstract class BaseSettings<T> : ISettings where T : BaseSettings<T>, new()
     {

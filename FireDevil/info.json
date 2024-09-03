@@ -1,12 +1,12 @@
 {
-    "Id": "FireDevil",
-    "DisplayName": "FireDevil",
-    "Author": "Truinto",
-    "Version": "1.1.0",
-    "ManagerVersion": "0.27.14",
-    "Requirements": [],
-    "AssemblyName": "FireDevil.dll",
-    "HomePage": "https://github.com/Truinto/CultOfTheLamb-Truinto/releases",
-    "Repository": "https://raw.githubusercontent.com/Truinto/CultOfTheLamb-Truinto/master/FireDevil/Settings/Repository.json",
-    "EntryMethod": "FireDevil.Main.Load"
+  "Id": "FireDevil",
+  "DisplayName": "FireDevil",
+  "Author": "Truinto",
+  "Version": "1.1.1",
+  "ManagerVersion": "0.27.14",
+  "Requirements": [],
+  "AssemblyName": "FireDevil.dll",
+  "HomePage": "https://github.com/Truinto/CultOfTheLamb-Truinto/releases",
+  "Repository": "https://raw.githubusercontent.com/Truinto/CultOfTheLamb-Truinto/master/FireDevil/Settings/Repository.json",
+  "EntryMethod": "FireDevil.Main.LoadUMM"
 }

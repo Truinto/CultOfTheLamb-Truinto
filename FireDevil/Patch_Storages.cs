@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FireDevil
 {
     [HarmonyPatch]
-    public class Patch_Storages
+    public static class Patch_Storages
     {
         [HarmonyPatch(typeof(Structures_Shrine), nameof(Structures_Shrine.SoulMax), MethodType.Getter)]
         [HarmonyPostfix]
@@ -40,7 +40,6 @@ namespace FireDevil
             inventory.Add(item);
         }
 
-
         [HarmonyPatch(typeof(Structures_SiloSeed), nameof(Structures_SiloSeed.Capacity), MethodType.Getter)]
         [HarmonyPrefix]
         public static void Silo1(ref float __result)
@@ -62,6 +61,11 @@ namespace FireDevil
             amount = (int)(amount * Settings.State.compostMult);
         }
 
-
+        [HarmonyPatch(typeof(Structures_CompostBin), nameof(Structures_CompostBin.CompostCost), MethodType.Getter)]
+        [HarmonyPostfix]
+        public static void Compost2(ref int __result)
+        {
+            __result = Settings.State.compostCost;
+        }
     }
 }

@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0]
+- added option composter cost
+- readded adoration overflow
+- added option for free heavy attack
+- added follower command options (more murder)
+- added option to set range for some buildings
+- added option for seed-buckets to keep dispensing seeds, even if empty
+- changed seed-bucket logic to take priority seeds first, instead of all seeds in deposite order
+- fixed farm to take from closest silo, even if prioritising a seed
+- changed it so the secondary button on fertilizer-bucket only takes normal fertilizer, instead of all types
+- allowing take necklace action on elderly
+- add support for BepInEx
+
 ## [1.1.0]
 - update to version 1.4.3.228
 - removed some broken features

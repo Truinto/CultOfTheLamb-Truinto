@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#if UMM
+
 using UnityModManagerNet;
 
 namespace FireDevil
 {
     [HarmonyPatch(typeof(UnityModManager.UI), nameof(UnityModManager.UI.ToggleWindow), typeof(bool))]
-    public class Patch_Lockstate
+    public static class Patch_Lockstate
     {
         public static void Prefix()
         {
@@ -23,3 +20,5 @@ namespace FireDevil
         }
     }
 }
+
+#endif

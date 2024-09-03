@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FireDevil
 {
     [HarmonyPatch]
-    public class Patch_RitualCost
+    public static class Patch_RitualCost
     {
         [HarmonyPatch(typeof(UpgradeSystem), nameof(UpgradeSystem.ApplyRitualDiscount))]
         [HarmonyPostfix]

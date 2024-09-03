@@ -1,47 +1,61 @@
 ﻿global using HarmonyLib;
-global using JetBrains.Annotations;
 global using Newtonsoft.Json;
 global using System;
 global using System.Collections.Generic;
-global using System.Diagnostics;
 global using System.Linq;
 global using System.Reflection;
 global using System.Reflection.Emit;
 global using UnityEngine;
-using Newtonsoft.Json.Linq;
+using System.IO;
 using System.Text.RegularExpressions;
+
+#if UMM
 using UnityModManagerNet;
+#endif
+#if BEPINEX
+using BepInEx;
+#endif
 
 namespace FireDevil
 {
+#if BEPINEX
+    [BepInPlugin("Truinto.FireDevil", "Fire Devil", "2.0.0")]
+    public class Main : BaseUnityPlugin
+#else
     public static class Main
+#endif
     {
+        #region Fields
         public static string ModPath;
-        private static UnityModManager.ModEntry.ModLogger logger;
         private static Harmony harmony;
 
-        public static bool Load(UnityModManager.ModEntry modEntry)
-        {
-            logger = modEntry.Logger;
-            ModPath = modEntry.Path;
-            harmony = new(modEntry.Info.Id);
+        private static FieldInfo IntRange_Min = typeof(IntRange).GetField("<Min>k__BackingField", AccessTools.all);
+        private static FieldInfo IntRange_Max = typeof(IntRange).GetField("<Max>k__BackingField", AccessTools.all);
+        #endregion
 
-            modEntry.OnGUI = OnGUI;
-            modEntry.OnSaveGUI = OnSaveGUI;
-            modEntry.OnHideGUI = OnHideGUI;
+        public static void Load()
+        {
+            ModPath ??= Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            harmony ??= new Harmony("Truinto.FireDevil");
 #if DEBUG
             //PatchSafe(typeof(Patch_GetTasks));
-            PatchSafe(typeof(Patch_Demons));
 #endif
-            PatchSafe(typeof(Patch_Lockstate));
-            PatchSafe(typeof(Patch_MurderAction));
+            PatchSafe(typeof(Patch_Weapons));
+            PatchSafe(typeof(Patch_FollowerCommands));
+            PatchSafe(typeof(Patch_FollowerCommands2));
             PatchSafe(typeof(Patch_LumberMine));
             PatchSafe(typeof(Patch_FollowerInfo));
             PatchSafe(typeof(Patch_Fleece));
             PatchSafe(typeof(Patch_Storages));
             PatchSafe(typeof(Patch_Adoration));
             PatchSafe(typeof(Patch_RitualCost));
-
+            PatchSafe(typeof(Patch_Age));
+            PatchSafe(typeof(Patch_Farming));
+            PatchSafe(typeof(Patch_Farming2));
+            PatchSafe(typeof(Patch_Farming3));
+            PatchSafe(typeof(Patch_Cooking));
+            PatchSafe(typeof(Patch_Refinery));
+#if !DEBUG
             var nullFinalizer = new HarmonyMethod(AccessTools.Method(typeof(Main), nameof(Main.NullFinalizer)));
             foreach (var patch in harmony.GetPatchedMethods().ToArray())
             {
@@ -51,27 +65,46 @@ namespace FireDevil
                     Print("Applied finalizer to " + patch.Name);
                 }
             }
-
+#endif
+            CallSafe(() => _ = Patch_Cooking.Recipes);
             UpdateStaticSettings();
-
-            return true;
         }
 
         public static void UpdateStaticSettings()
         {
             HarvestTotem.EFFECTIVE_DISTANCE = Settings.State.harvestTotemRadius;
+            Structures_PropagandaSpeaker.EFFECTIVE_DISTANCE = Settings.State.propagandaSpeakerRadius;
+
+            //IntRange_Min?.SetValue(MissionaryManager.SeedRange, 10); // todo
+            //IntRange_Max?.SetValue(MissionaryManager.SeedRange, 16);
         }
 
-        #region GUI
+        #region UnityModManager
+#if UMM
+
+        private static UnityModManager.ModEntry.ModLogger logger;
+
+        public static bool LoadUMM(UnityModManager.ModEntry modEntry)
+        {
+            logger = modEntry.Logger;
+            ModPath = modEntry.Path;
+            harmony = new(modEntry.Info.Id);
+
+            modEntry.OnGUI = OnGUI;
+            modEntry.OnSaveGUI = OnSaveGUI;
+            modEntry.OnHideGUI = OnHideGUI;
+            
+            PatchSafe(typeof(Patch_Lockstate));
+            Load();
+
+            return true;
+        }
 
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
         private static GUILayoutOption DontExpand = GUILayout.ExpandWidth(false);
-        private static bool[] Toggles = new bool[4];
+        private static bool[] Toggles = new bool[5];
         private static int LastTrait;
-        private static int CursorCounter;
-        private static int CursorIndex;
-        private static string CursorBuffer;
         private static FollowerTrait.TraitType[] AllTraits = (FollowerTrait.TraitType[])Enum.GetValues(typeof(FollowerTrait.TraitType));
         private static Regex RxClean = new("<.*?>");
         private static void OnGUI(UnityModManager.ModEntry modEntry)
@@ -85,8 +118,10 @@ namespace FireDevil
 
             if (Folder(ref Toggles[0], "Settings"))
             {
-                CursorCounter = 0;
                 GUILayout.Space(5);
+                //Checkbox(ref Settings.State.globalTaskPatch, "Injects new task types");
+                Checkbox(ref Settings.State.hideNecklaceAction, "Hide necklace actions");
+                Checkbox(ref Settings.State.autoAddCookingTask, "Automatically add cooking tasks");
                 Checkbox(ref Settings.State.showMurderAction, "Always show murder action");
                 Checkbox(ref Settings.State.showFollowerRole, "Show follower role in thoughts");
                 Checkbox(ref Settings.State.infiniteMineI, "Infinite Lumber and Stone Mine");
@@ -94,22 +129,26 @@ namespace FireDevil
                 Checkbox(ref Settings.State.instantPickup, "Instantly pickup mine resources");
                 Checkbox(ref Settings.State.disableFleecePenalty, "Disable most fleece penalties");
                 Checkbox(ref Settings.State.loyaltyOverflow, "Allow follower loyalty overflow to next level");
-                //Checkbox(ref Settings.State.globalTaskPatch, "Injects new task types");
+                Checkbox(ref Settings.State.freeHeavyAttack, "Heavy attacks consume no fervour");
+                Checkbox(ref Settings.State.siloBucketInfinite, "Seed bucket gives out infinte seeds even if empty");
+                Checkbox(ref Settings.State.blessSuperRange, "Bless has 10x bigger radius");
 
                 NumberField(ref Settings.State.storageShrineMult, "Shrine soul maximum multiplier");
                 NumberField(ref Settings.State.storageOuthouseMult, "Outhouse maximum multiplier");
                 NumberField(ref Settings.State.storageSiloMult, "Silo maximum multiplier");
-                NumberField(ref Settings.State.compostMult, "Extra compost multiplier");
+                NumberField(ref Settings.State.compostMult, "Compost multiplier");
+                NumberField(ref Settings.State.compostCost, "Compost cost (grass)");
                 NumberField(ref Settings.State.ritualCostMult, "Ritual cost multiplier");
                 NumberField(ref Settings.State.ritualCooldownMult, "Ritual cooldown multiplier");
                 NumberField(ref Settings.State.harvestTotemRadius, "Harvest Totem radius", 100f, UpdateStaticSettings);
+                NumberField(ref Settings.State.propagandaSpeakerRadius, "Propaganda Speaker radius", 100f, UpdateStaticSettings);
+                NumberField(ref Settings.State.farmStationRadius, "Farm Station radius", 100f);
 
                 GUILayout.Space(10);
             }
 
             if (Folder(ref Toggles[1], "Doctrines"))
             {
-                CursorCounter = 1000;
                 GUILayout.Space(5);
                 foreach (var doctrine in Unlocks.GetDoctrines())
                 {
@@ -129,43 +168,46 @@ namespace FireDevil
                 GUILayout.Space(10);
             }
 
-            //if (Folder(ref Toggles[2], "Weapon Probability"))
-            //{
-            //    CursorCounter = 2000;
-            //    var weaponType = EquipmentType.None;
-            //    foreach (var weapon in WeaponWeight.GetWeapons())
-            //    {
-            //        if (weapon.PrimaryEquipmentType != weaponType)
-            //        {
-            //            weaponType = weapon.PrimaryEquipmentType;
-            //            GUILayout.Space(5);
-            //            GUILayout.BeginHorizontal();
-            //            if (GUILayout.Button(weapon.PrimaryEquipmentType.ToString(), StyleBox, DontExpand))
-            //            {
-            //                foreach (var weapon2 in WeaponWeight.GetWeapons())
-            //                    if (weapon2.PrimaryEquipmentType == weaponType)
-            //                        weapon2.Weight = 0f;
-            //            }
-            //            GUILayout.EndHorizontal();
-            //        }
+            /*if (Folder(ref Toggles[2], "Weapon Probability"))
+            {
+                CursorCounter = 2000;
+                var weaponType = EquipmentType.None;
+                foreach (var weapon in WeaponWeight.GetWeapons())
+                {
+                    if (weapon.PrimaryEquipmentType != weaponType)
+                    {
+                        weaponType = weapon.PrimaryEquipmentType;
+                        GUILayout.Space(5);
+                        GUILayout.BeginHorizontal();
+                        if (GUILayout.Button(weapon.PrimaryEquipmentType.ToString(), StyleBox, DontExpand))
+                        {
+                            foreach (var weapon2 in WeaponWeight.GetWeapons())
+                                if (weapon2.PrimaryEquipmentType == weaponType)
+                                    weapon2.Weight = 0f;
+                        }
+                        GUILayout.EndHorizontal();
+                    }
 
-            //        GUILayout.BeginHorizontal();
-            //        GUILayout.Label(weapon.GetLocalisedTitle() + ": ", GUILayout.Width(200));
-            //        weapon.Weight = GUILayout.HorizontalSlider(weapon.Weight, 0f, 10f, GUILayout.Width(100));
-            //        GUILayout.Label(weapon.Weight.ToString("0.0"));
-            //        GUILayout.EndHorizontal();
-            //    }
-            //    GUILayout.Space(10);
-            //}
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(weapon.GetLocalisedTitle() + ": ", GUILayout.Width(200));
+                    weapon.Weight = GUILayout.HorizontalSlider(weapon.Weight, 0f, 10f, GUILayout.Width(100));
+                    GUILayout.Label(weapon.Weight.ToString("0.0"));
+                    GUILayout.EndHorizontal();
+                }
+                GUILayout.Space(10);
+            }*/
 
+            // TODO: item editor
+            //InventoryItem.ITEM_TYPE.PLEASURE_POINT
+            //Inventory.AddItem
+
+            //todo DataManager.AllNecklaces
             if (Folder(ref Toggles[3], "Followers"))
             {
-                CursorCounter = 3000;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Name", GUILayout.Width(150));
-                GUILayout.Label("Age", GUILayout.Width(50));
+                GUILayout.Label("Age", GUILayout.Width(30));
                 GUILayout.Label("Lifespan", GUILayout.Width(50));
-                GUILayout.Label("Loyalty", GUILayout.Width(50));
                 GUILayout.Label("State", GUILayout.Width(70));
                 GUILayout.Label("Necklace", GUILayout.Width(100));
                 GUILayout.Label("Role", GUILayout.Width(100));
@@ -183,10 +225,14 @@ namespace FireDevil
                     GUILayout.BeginHorizontal();
 
                     StringField(ref follower.Name, 150f);
-                    GUILayout.Label(follower.Age.ToString().ColorCond(follower.Age >= follower.LifeExpectancy, "red"), GUILayout.Width(50));
+                    GUILayout.Label(follower.Age.ToString().ColorCond(follower.Age >= follower.LifeExpectancy, "red"), GUILayout.Width(30));
                     GUILayout.Label(follower.LifeExpectancy.ToString(), GUILayout.Width(50));
-                    GUILayout.Label(follower.Adoration.ToString(), GUILayout.Width(50));
-                    GUILayout.Label(follower.CursedState.ToString(), GUILayout.Width(70));
+                    if (GUILayout.Button(follower.CursedState.ToString(), StyleBox, GUILayout.Width(70)))
+                    {
+                        if (follower.CursedState == Thought.OldAge)
+                            follower.LifeExpectancy = follower.Age + 20;
+                        follower.CursedState = Thought.None;
+                    }
                     if (GUILayout.Button(follower.Necklace.ToString(), StyleBox, GUILayout.Width(100)))
                     {
                         switch (follower.Necklace) //LocalizationManager.GetTranslation
@@ -251,7 +297,6 @@ namespace FireDevil
 
                     if (LastTrait == follower.ID)
                     {
-                        CursorCounter = 4000 + follower.ID;
                         foreach (var trait in AllTraits)
                         {
                             GUILayout.BeginHorizontal();
@@ -270,7 +315,45 @@ namespace FireDevil
                         }
                     }
                 }
+            }
 
+            if (Folder(ref Toggles[4], "Dead Followers"))
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Name", GUILayout.Width(150));
+                GUILayout.Label("Age", GUILayout.Width(30));
+                GUILayout.Label("Lifespan", GUILayout.Width(50));
+                GUILayout.Label("State", GUILayout.Width(70));
+                GUILayout.Label("Necklace", GUILayout.Width(100));
+                GUILayout.Label("Role", GUILayout.Width(100));
+                GUILayout.Label("Married", GUILayout.Width(50));
+
+                //GUILayout.Label("Skin", GUILayout.Width(50));
+                GUILayout.Label("Skin Name", GUILayout.Width(100));
+                //GUILayout.Label("Variant", GUILayout.Width(50));
+                //GUILayout.Label("Color", GUILayout.Width(50));
+
+                GUILayout.EndHorizontal();
+
+                for (int i = 0; i < DataManager.Instance.Followers_Dead.Count; i++)
+                {
+                    var follower = DataManager.Instance.Followers_Dead[i];
+                    GUILayout.BeginHorizontal();
+
+                    StringField(ref follower.Name, 150f);
+                    GUILayout.Label(follower.Age.ToString().ColorCond(follower.Age >= follower.LifeExpectancy, "red"), GUILayout.Width(30));
+                    GUILayout.Label(follower.LifeExpectancy.ToString(), GUILayout.Width(50));
+
+                    if (!FollowerManager.UniqueFollowerIDs.Contains(follower.ID) && GUILayout.Button("Remove", StyleBox, GUILayout.Width(70)))
+                    {
+                        DataManager.Instance.Followers_Dead.Remove(follower);
+                        DataManager.Instance.Followers_Dead_IDs.Remove(follower.ID);
+                        FollowerManager.RemoveFollowerBrain(follower.ID);
+                        ObjectiveManager.FailUniqueFollowerObjectives(follower.ID);
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
             }
 
             // Debug
@@ -291,6 +374,10 @@ namespace FireDevil
                         Print("kitchen: " + kitchen.structure.Structure_Info.ID);
                 }
                 catch (Exception e) { PrintException(e); }
+            }
+            if (GUILayout.Button("Debug +1000 gold", DontExpand))
+            {
+                Inventory.AddItem(InventoryItem.ITEM_TYPE.BLACK_GOLD, 1000, true);
             }
         }
 
@@ -315,7 +402,6 @@ namespace FireDevil
 
         private static void NumberField(ref float value, string label, float width = 100f, Action action = null)
         {
-            CursorCounter++;
             if (label != null)
             {
                 GUILayout.BeginHorizontal();
@@ -334,7 +420,6 @@ namespace FireDevil
 
         private static void NumberField(ref int value, string label, int min = int.MinValue, int max = int.MaxValue, float width = 100f, Action action = null)
         {
-            CursorCounter++;
             if (label != null)
             {
                 GUILayout.BeginHorizontal();
@@ -357,13 +442,11 @@ namespace FireDevil
 
         private static void StringField(ref string value, float width = 100f, Action action = null)
         {
-            CursorCounter++;
-            string newvalue = GUILayout.TextField(CursorIndex == CursorCounter ? CursorBuffer : value, GUILayout.Width(width));
+            //string newvalue = GUILayout.TextField(CursorIndex == CursorCounter ? CursorBuffer : value, GUILayout.Width(width));
+            string newvalue = GUILayout.TextField(value, GUILayout.Width(width));
             if (newvalue != value)
             {
                 newvalue = newvalue.Replace("\r", "R").Replace("\n", "N"); // TODO: only set when ENTER is pressed
-                CursorIndex = CursorCounter;
-                CursorBuffer = newvalue;
                 value = newvalue;
                 action?.Invoke();
             }
@@ -372,13 +455,13 @@ namespace FireDevil
         private static bool Folder(ref bool flag, string text)
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(flag ? "<color=yellow><b>▶</b></color>" : "<color=lime><b>▼</b></color>", StyleBox, GUILayout.Width(20)))
+            if (GUILayout.Button(flag ? "<color=lime><b>▼</b></color>" : "<color=yellow><b>▶</b></color>", StyleBox, GUILayout.Width(20)))
                 flag = !flag;
             GUILayout.Space(3);
             GUILayout.Label(text);
             GUILayout.EndHorizontal();
 
-            return !flag;
+            return flag;
         }
 
         private static string ColorCond(this string text, bool cond, string ifTrue, string ifFalse = null)
@@ -390,20 +473,40 @@ namespace FireDevil
             else
                 return text;
         }
+#endif
+        #endregion
 
+        #region BepInEx
+#if BEPINEX
+        internal static BepInEx.Logging.ManualLogSource logger;
+        public void Awake()
+        {
+            logger = this.Logger;
+            ModPath = Path.GetDirectoryName(this.Info.Location);
+            Load();
+            logger.LogInfo($"FireDevil is loaded!");
+        }
+#endif
         #endregion
 
         #region Helper
 
         internal static void Print(string msg)
         {
+#if BEPINEX
+            logger.LogDebug(msg);
+#else
             logger.Log(msg);
+#endif
         }
 
         internal static void PrintException(Exception e)
         {
-            logger.Log("Firedevil Exception!");
+#if BEPINEX
+            logger.LogError(e);
+#else
             logger.LogException(e);
+#endif
         }
 
         internal static void PatchSafe(Type patch)
@@ -413,14 +516,23 @@ namespace FireDevil
                 Print("Patching " + patch.Name);
                 harmony.CreateClassProcessor(patch).Patch();
             }
-            catch (Exception e) { logger.LogException(e); }
+            catch (Exception e) { PrintException(e); }
+        }
+
+        internal static void CallSafe(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e) { PrintException(e); }
         }
 
         internal static Exception NullFinalizer(Exception __exception)
         {
 #if !DEBUG
             return null;
-#endif
+#else
             if (__exception == null)
                 return null;
             try
@@ -429,9 +541,9 @@ namespace FireDevil
             }
             catch (Exception) { }
             return null;
+#endif
         }
 
         #endregion
-
     }
 }
