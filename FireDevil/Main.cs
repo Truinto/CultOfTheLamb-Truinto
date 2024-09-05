@@ -16,7 +16,7 @@ namespace FireDevil
     public static class Main
     {
         #region Fields
-        public const string version = "2.0.1";
+        public const string version = "2.0.2";
         internal static ILogger logger;
         public static string ModPath;
         public static Harmony harmony;
@@ -162,6 +162,7 @@ namespace FireDevil
                 Checkbox(ref Settings.State.infiniteMineII, "Infinite Lumber and Stone Mine Level 2");
                 Checkbox(ref Settings.State.instantPickup, "Instantly pickup mine resources");
                 Checkbox(ref Settings.State.redirectPlayerInventory, "Redirect items to player inventory (farm, refinery)");
+                Checkbox(ref Settings.State.hideItemPopup, "Hide popup when item is collected");
                 Checkbox(ref Settings.State.disableFleecePenalty, "Disable most fleece penalties");
                 Checkbox(ref Settings.State.loyaltyOverflow, "Allow follower loyalty overflow to next level");
                 Checkbox(ref Settings.State.freeHeavyAttack, "Heavy attacks consume no fervour");
@@ -178,6 +179,7 @@ namespace FireDevil
                 NumberField(ref Settings.State.harvestTotemRadius, "Harvest Totem radius", 100f, Main.UpdateStaticSettings);
                 NumberField(ref Settings.State.propagandaSpeakerRadius, "Propaganda Speaker radius", 100f, Main.UpdateStaticSettings);
                 NumberField(ref Settings.State.farmStationRadius, "Farm Station radius", 100f);
+                NumberField(ref Settings.State.farmSignRadius, "Farm Sign radius", 100f);
 
                 GUILayout.Space(10);
             }
@@ -413,6 +415,22 @@ namespace FireDevil
             if (GUILayout.Button("Debug +1000 gold", DontExpand))
             {
                 Inventory.AddItem(InventoryItem.ITEM_TYPE.BLACK_GOLD, 1000, true);
+            }
+            if (GUILayout.Button("Debug farm plots", DontExpand))
+            {
+                foreach (var silo in StructureManager.GetAllStructuresOfType<Structures_SiloSeed>(FollowerLocation.Base))
+                {
+                    Main.Print($"silo content={silo.Data.Inventory.Join(a => $"{(InventoryItem.ITEM_TYPE)a.type}:{a.quantity}")}");
+                }
+
+                foreach (var plot in StructureManager.GetAllStructuresOfType<Structures_FarmerPlot>(FollowerLocation.Base))
+                {
+                    Main.Print($"plant={plot.Data.GrowthStage:00.00} seed={(InventoryItem.ITEM_TYPE)(plot.GetPlantedSeed()?.type ?? 0)}");
+                }
+            }
+            if (GUILayout.Button("Debug crash", DontExpand))
+            {
+                throw new Exception("debug crash");
             }
         }
 

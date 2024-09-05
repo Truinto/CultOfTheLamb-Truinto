@@ -9,16 +9,24 @@ namespace FireDevil
     [HarmonyPatch]
     public static class Patch_Storages
     {
+        [HarmonyPatch(typeof(NotificationCentre), nameof(NotificationCentre.CheckToShowHUD))]
+        [HarmonyPostfix]
+        public static void Postfix_ShowItemPopup(ref bool __result)
+        {
+            __result = !Settings.State.hideItemPopup;
+        }
+
         /// <summary>
         /// Stores items directly to player inventory, instead of structure inventory.
         /// </summary>
         [HarmonyPatch(typeof(StructureBrain), nameof(StructureBrain.DepositItem))]
+        [HarmonyPrefix]
         public static bool Prefix_RedirectPlayerInventory(InventoryItem.ITEM_TYPE type, int quantity, StructureBrain __instance)
         {
             if (!Settings.State.redirectPlayerInventory)
                 return true;
 
-            if (__instance is Structures_FarmerStation or Structures_Refinery or Structures_OfferingShrine)
+            if (__instance is Structures_FarmerStation or Structures_Refinery)
             {
                 Inventory.AddItem((int)type, quantity, true);
                 return false;

@@ -32,13 +32,7 @@ namespace FireDevil
                 if (silo.Data.Type == StructureBrain.TYPES.SEED_BUCKET || silo.Data.IsCollapsed || silo.Data.Inventory.Count <= 0)
                     continue;
 
-                if (closest_silo == null)
-                {
-                    closest_silo = silo;
-                    continue;
-                }
-
-                bool is_closer = Vector3.Distance(silo.Data.Position, fromPosition) < Vector3.Distance(closest_silo.Data.Position, fromPosition);
+                bool is_closer = closest_silo == null || Vector3.Distance(silo.Data.Position, fromPosition) < Vector3.Distance(closest_silo.Data.Position, fromPosition);
                 if (!check_priority) // if no priority given, just get closest
                 {
                     if (is_closer)
@@ -46,11 +40,12 @@ namespace FireDevil
                     continue;
                 }
 
-                bool has_priority = silo.Data.Inventory.Any(a => a.type == (int)prioritisedSeedType && a.UnreservedQuantity > 0);
+                bool has_priority = silo.Data.Inventory.Any(a => a.type == (int)prioritisedSeedType);
                 if (has_priority)
                 {
-                    if (is_closer || !found_priority) // if this is the first priority, ignore distance                    
+                    if (is_closer || !found_priority) // if this is the first priority, ignore distance                                      
                         closest_silo = silo;
+
                     found_priority = true;
                 }
                 else if (!found_priority) // non-priority only allowed, if priority not found yet

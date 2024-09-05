@@ -8,7 +8,7 @@ namespace FireDevil
 {
     public class Settings : BaseSettings<Settings>
     {
-        public Settings() => version = 4;
+        public Settings() => version = 5;
 
         [JsonProperty] public bool hideNecklaceAction = false;
         [JsonProperty] public bool autoAddCookingTask = true;
@@ -17,7 +17,8 @@ namespace FireDevil
         [JsonProperty] public bool infiniteMineI = false;
         [JsonProperty] public bool infiniteMineII = true;
         [JsonProperty] public bool instantPickup = true;
-        [JsonProperty] public bool redirectPlayerInventory = true;
+        [JsonProperty] public bool redirectPlayerInventory = false;
+        [JsonProperty] public bool hideItemPopup = false;
         [JsonProperty] public bool disableFleecePenalty = false;
         [JsonProperty] public bool loyaltyOverflow = true;
         [JsonProperty] public bool freeHeavyAttack = true;

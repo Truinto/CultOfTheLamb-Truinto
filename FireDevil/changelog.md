@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.2]
+- fixed issue with seed silo
+- fixed inventory redirect not working
+
 ## [2.0.1]
 - add option to redirect items to player inventory
 
