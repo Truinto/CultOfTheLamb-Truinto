@@ -6,28 +6,19 @@
 		<Configurations>Debug;Release;Release_Bep</Configurations>
 	</PropertyGroup>
 
-	<Choose>
-		<!-- BepInEx -->
-		<When Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(Configuration), '^.*_Bep$' ))">
-			<PropertyGroup>
-				<DefineConstants>$(DefineConstants);BEPINEX</DefineConstants>
-				<OutputPath>bin\Bep\</OutputPath>
-				<ModFolder>$(GameManaged)/../../BepInEx/plugins/$(TargetName)/</ModFolder>
-			</PropertyGroup>
-			<ItemGroup>
-			</ItemGroup>
-		</When>
-		<Otherwise>
-			<PropertyGroup>
-				<DefineConstants>$(DefineConstants);UMM</DefineConstants>
-			</PropertyGroup>
-			<ItemGroup>
-			</ItemGroup>
-		</Otherwise>
-	</Choose>
+	<PropertyGroup Condition="$(Configuration.Contains('_Bep'))">
+		<DefineConstants>$(DefineConstants);BEPINEX</DefineConstants>
+		<OutputPath>bin\Bep\</OutputPath>
+		<ModFolder>$(GameManaged)/../../BepInEx/plugins/$(TargetName)/</ModFolder>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="!$(Configuration.Contains('_Bep'))">
+		<DefineConstants>$(DefineConstants);UMM</DefineConstants>
+	</PropertyGroup>
 
 	<!-- Project References -->
 	<ItemGroup>
+		<Reference Private="false" Include="UnityMod" HintPath="$(SolutionDir)\@Shared\UnityMod.dll" />
 		<Reference Private="false" Include="BepInEx" HintPath="$(GameManaged)\..\..\BepInEx\core\BepInEx.dll" />
 		<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
 
@@ -48,15 +39,6 @@
 		<Reference Private="false" Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Private="false" Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
 		<Reference Private="false" Include="UnityEngine.Physics2DModule" HintPath="$(GameManaged)\UnityEngine.Physics2DModule.dll" />
-
-		<Reference Private="false" Include="UnityMod" HintPath="$(SolutionDir)\@Shared\UnityMod.dll" />
-		
-		<TargetMergeItems Include="$(SolutionDir)/@Shared/UnityMod.dll" />
-		<TargetCopyTarget Include="$(ModFolder)/$(TargetName)/" />
-		<TargetZipItems Include="$(ModFolder)/$(TargetName)/FireDevil.dll" />
-		<TargetZipItems Include="$(ModFolder)/$(TargetName)/changelog.md" />
-		<TargetZipItems Include="$(ModFolder)/$(TargetName)/info.json" />
-		<TargetZipTarget Condition="'$(Configuration)'=='Release_Bep'" Include="$(GameManaged)/../../Mods/$(TargetName)/$(TargetName)_BepInEx.zip" />
 	</ItemGroup>
 
 	<!-- Other Files -->
@@ -65,54 +47,25 @@
 		<None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
-	<!-- Publicize -->
-	<Target Name="Publicize" BeforeTargets="Clean;BeforeBuild" AfterTargets="">
-		<ItemGroup>
-			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
-		</ItemGroup>
-		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(GameManaged)\" />
-	</Target>
+	<!-- Target Automation -->
+	<ItemGroup>
+		<VersioningTask_In Include="$(MSBuildThisFileFullPath)" />
+		<VersioningTask_In Include="changelog.md" />
+		<VersioningTask_Out DropRevision="never" Include="$(MSBuildThisFileFullPath)" />
+		<VersioningTask_Out DropRevision="keep" Include="info.json" />
+		<VersioningTask_Out DropRevision="keep" Include="Main.cs" />
+		<VersioningTask_Out DropRevision="keep" Include="Settings/Repository.json" Max="2" />
 
-	<!-- Update build version -->
-	<Target Name="Versioning" BeforeTargets="BeforeBuild">
-		<ItemGroup>
-			<_VersioningIn Include="$(MSBuildThisFileFullPath)" />
-			<_VersioningIn Include="changelog.md" />
-			<_VersioningOut Include="$(MSBuildThisFileFullPath)" />
-			<_VersioningOut Include="info.json" />
-			<_VersioningOut Include="Main.cs" />
-			<_VersioningOut Include="Settings\Repository.json" Max="2" />
-		</ItemGroup>
-		<VersioningTask InputFiles="@(_VersioningIn)" UpdateFiles="@(_VersioningOut)" MaxMatch="1" TouchFiles="false" />
-	</Target>
+		<TargetPublicizeItems Include="$(GameManaged)/Assembly-CSharp.dll" />
 
-	<!-- ILMerge and copy to solution folder -->
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<ItemGroup>
-			<_MergeItems Include="$(TargetDir)$(TargetName).dll" />
-			<_MergeItems Include="$(SolutionDir)@Shared\UnityMod.dll" />
+		<TargetMergeItems Include="$(SolutionDir)/@Shared/UnityMod.dll" />
 
-			<_CopyItems Include="$(TargetDir)\*" />
-			<_CopyItems Include="$(SolutionDir)@Shared\UnityMod.dll" />
+		<TargetCopyTarget Include="$(ModFolder)/$(TargetName)/" />
 
-			<_Zip Include="$(ModFolder)\$(TargetName)\info.json" />
-			<_Zip Include="$(ModFolder)\$(TargetName)\changelog.md" />
-			<_Zip Include="$(ModFolder)\$(TargetName)\FireDevil.dll" />
-
-			<_Zip_Bep Include="$(GameManaged)\..\..\BepInEx\plugins\$(TargetName)\FireDevil.dll" />
-		</ItemGroup>
-
-		<!--<ILRepack Condition="'$(Configuration)'!='Release_Bep'" XmlDocumentation="true" Union="true" DebugInfo="true" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
-		<Exec Condition="'$(Configuration)'!='Release_Bep' And Exists('$(Tools)') And '%(Reference.Identity)'=='UnityEngine'" Command="&quot;$(Tools)pdb2mdb.exe&quot; &quot;$(TargetDir)$(TargetName).dll&quot;"/>
-		<Copy Condition="'$(Configuration)'!='Release_Bep'" SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
-		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\$(TargetName)\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
-		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
-
-		<ILRepack Condition="'$(Configuration)'=='Release_Bep'" XmlDocumentation="true" Union="true" DebugInfo="true" LibraryPath="$(GameManaged);$(GameManaged)\..\..\BepInEx\core" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
-		<Exec Condition="'$(Configuration)'=='Release_Bep' And Exists('$(Tools)') And '%(Reference.Identity)'=='UnityEngine'" Command="&quot;$(Tools)pdb2mdb.exe&quot; &quot;$(TargetDir)$(TargetName).dll&quot;"/>
-		<Copy Condition="'$(Configuration)'=='Release_Bep'" SourceFiles="@(_CopyItems)" DestinationFolder="$(GameManaged)\..\..\BepInEx\plugins\$(TargetName)\%(RecursiveDir)" />
-		<ZipTask Condition="'$(Configuration)'=='Release_Bep'" ZipFileName="$(ModFolder)\$(TargetName)\$(TargetName)_BepInEx.zip" WorkingDirectory="$(GameManaged)\..\..\BepInEx\plugins" Files="@(_Zip_Bep)" />
-		<Message Condition="'$(Configuration)'=='Release_Bep'" Text="Updated $(TargetName).zip" Importance="High" />-->
-	</Target>
+		<TargetZipItems Include="$(ModFolder)/$(TargetName)/FireDevil.dll" />
+		<TargetZipItems Include="$(ModFolder)/$(TargetName)/changelog.md" />
+		<TargetZipItems Include="$(ModFolder)/$(TargetName)/info.json" />
+		<TargetZipTarget Condition="'$(Configuration)'=='Release_Bep'" Include="$(GameManaged)/../../Mods/$(TargetName)/$(TargetName)_BepInEx.zip" />
+	</ItemGroup>
 
 </Project>

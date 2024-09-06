@@ -44,10 +44,29 @@
 		 Note: ItemGroup inside a Target is applied only after the Target is finished. 
 		 Do not set ItemGroup and CallTarget in the same Target. -->
 	<ItemGroup Condition="false">
+		<VersioningTask_In Include="$(MSBuildThisFileFullPath)" />
+		<VersioningTask_In Include="changelog.md" />
+		<VersioningTask_Out DropRevision="never" Include="$(MSBuildThisFileFullPath)" />
+		<VersioningTask_Out DropRevision="keep" Include="info.json" />
+		<VersioningTask_Out DropRevision="keep" Include="Settings/Repository.json" Max="2" />
+		<TargetPublicizeItems Include="$(GameManaged)/Assembly-CSharp.dll" />
 		<TargetMergeItems Include="$(SolutionDir)/@Shared/UnityMod.dll" />
 		<TargetCopyTarget Include="$(ModFolder)/$(TargetName)/" />
 		<!--<TargetZipItems Include="false" />-->
 	</ItemGroup>
+
+	<!-- Target to generate publicized assemblies.
+		 required: @TargetPublicizeItems: assemblies to process
+		 optional: $TargetPublicizeDir: where to store new assemblies; if empty folder of first @TargetPublicizeItems -->
+	<Target Name="Publicize" BeforeTargets="Clean;BeforeBuild" AfterTargets="">
+		<ItemGroup>
+			<TargetPublicizeItemsA Include="@(TargetPublicizeItems->Reverse())" />
+		</ItemGroup>
+		<PropertyGroup>
+			<TargetPublicizeDir>$([MSBuild]::NormalizePath('%(TargetPublicizeItemsA.Identity)/../'))</TargetPublicizeDir>
+		</PropertyGroup>
+		<PublicizeTask InputAssemblies="@(TargetPublicizeItems)" OutputDir="$(TargetPublicizeDir)" />
+	</Target>
 
 	<!-- Target to merge given assemblies into primary assembly. Overwrites primary assembly.
 		 required: @TargetMergeItems: files to copy
@@ -60,7 +79,7 @@
 	<Target Name="TargetMergeA">
 		<ItemGroup>
 			<SourceDirsA Include="@(SourceDirs)" />
-			<SourceDirsA Condition="'%(Reference.HintPath)'!=''" Include="$([System.IO.Path]::GetDirectoryName('$([System.IO.Path]::GetFullPath('%(Reference.HintPath)'))'))" />
+			<SourceDirsA Condition="'%(Reference.HintPath)'!=''" Include="$([MSBuild]::NormalizePath('%(Reference.HintPath)/../'))" />
 			<SourceDirs Remove="%(SourceDirs.Identity)" />
 			<SourceDirs Include="@(SourceDirsA->Distinct())" />
 
@@ -131,5 +150,7 @@
 		<Message Text="Zip w=$(TargetZipWorkDir) -> @(TargetZipItems) -> $(TargetZipTarget)" Importance="High" />
 		<ZipTask ZipFileName="$(TargetZipTarget)" WorkingDirectory="$(TargetZipWorkDir)" Files="@(TargetZipItems)" />
 	</Target>
+
+	<!-- Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(Configuration), '^.*_Bep$' ))" -->
 
 </Project>
