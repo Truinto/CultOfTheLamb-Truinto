@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 namespace FireDevil
 {
     /// <summary>
+    /// Notes:<br/>
     /// Silos do not stack items. Every item is an <see cref="InventoryItem"/> with quantity of 1. See <seealso cref="Interaction_SiloFertilizer"/>.
+    /// 
+    /// Could make silos infinite see FollowerTask_Farm.DoingBegin "seedtypetoplant".
     /// </summary>
     [HarmonyPatch]
     public static class Patch_Farming
@@ -60,7 +63,7 @@ namespace FireDevil
 
         /// <summary>
         /// Changed seed-bucket logic to take priority seeds first, instead of all seeds in deposite order.<br/>
-        /// Added option for seed-buckets to keep dispensing seeds, even if empty. (Part 1/2)
+        /// Added option for seed-buckets to keep dispensing seeds/fertiliser, even if empty. (Part 1/3)
         /// </summary>
         [HarmonyPatch(typeof(FollowerTask_Farm), nameof(FollowerTask_Farm.DoingBegin))]
         [HarmonyTranspiler]
@@ -68,15 +71,29 @@ namespace FireDevil
         {
             var tool = new TranspilerTool(instructions, generator, original);
 
+            tool.Seek(typeof(Structures_SiloFertiliser), nameof(Structures_SiloFertiliser.RemoveCompostAmount), [typeof(int)]);
+            tool.ReplaceCall(removeCompostAmount);
+
             tool.Seek(typeof(Structures_SiloSeed), nameof(Structures_SiloSeed.GetCompost), [typeof(int)]);
-            tool.ReplaceCall(getCompost);
+            tool.ReplaceCall(getSeeds);
 
             tool.Seek(typeof(Structures_SiloSeed), nameof(Structures_SiloSeed.RemoveCompost), [typeof(List<InventoryItem.ITEM_TYPE>)]);
-            tool.ReplaceCall(removeCompost);
+            tool.ReplaceCall(removeSeeds);
 
             return tool;
 
-            static List<InventoryItem.ITEM_TYPE> getCompost(Structures_SiloSeed instance, int amount, [LocalParameter(indexByType: 0)] Structures_SiloSeed emptySeedSilo)
+            static List<InventoryItem> removeCompostAmount(Structures_SiloFertiliser instance, int amount)
+            {
+                var list = instance.RemoveCompostAmount(amount);
+                if (!Settings.State.siloBucketInfinite)
+                    return list;
+                amount -= list.Count;
+                while (amount-- > 0)
+                    list.Add(new(InventoryItem.ITEM_TYPE.POOP, 1));
+                return list;
+            }
+
+            static List<InventoryItem.ITEM_TYPE> getSeeds(Structures_SiloSeed instance, int amount, [LocalParameter(indexByType: 0)] Structures_SiloSeed emptySeedSilo)
             {
                 //var seed = StructureManager.GetStructureByID<Structures_FarmerPlot>(__instance._farmPlotID)?.GetPrioritisedSeedType() ?? InventoryItem.ITEM_TYPE.NONE;
                 var seed = GetPrioritisedSeedType(emptySeedSilo);
@@ -136,20 +153,33 @@ namespace FireDevil
                 return instance.GetCompost(amount); // default logic
             }
 
-            static void removeCompost(Structures_SiloSeed instance, List<InventoryItem.ITEM_TYPE> items)
+            static void removeSeeds(Structures_SiloSeed instance, List<InventoryItem.ITEM_TYPE> items)
             {
                 instance.RemoveCompost(items); // normal execution, works fine even when removing seeds that are not stored
             }
         }
 
         /// <summary>
-        /// Added option for seed-buckets to keep dispensing seeds, even if empty. (Part 2/2)
+        /// Added option for seed-buckets to keep dispensing seeds, even if empty. (Part 2/3)
         /// </summary>
         [HarmonyPatch(typeof(Structures_SiloSeed), nameof(Structures_SiloSeed.GetCompostCount))]
         [HarmonyPrefix]
         public static bool Prefix_InfiniteSeeds2(Structures_SiloSeed __instance, ref int __result)
         {
             if (!Settings.State.siloBucketInfinite || __instance.Data.Type != StructureBrain.TYPES.SEED_BUCKET)
+                return true;
+            __result = (int)__instance.Capacity;
+            return false;
+        }
+
+        /// <summary>
+        /// Added option for seed-buckets to keep dispensing fertiliser, even if empty. (Part 3/3)
+        /// </summary>
+        [HarmonyPatch(typeof(Structures_SiloFertiliser), nameof(Structures_SiloFertiliser.GetCompostCount))]
+        [HarmonyPrefix]
+        public static bool Prefix_InfiniteSeeds3(Structures_SiloFertiliser __instance, ref int __result)
+        {
+            if (!Settings.State.siloBucketInfinite || __instance.Data.Type != StructureBrain.TYPES.POOP_BUCKET)
                 return true;
             __result = (int)__instance.Capacity;
             return false;
@@ -164,7 +194,7 @@ namespace FireDevil
                 return InventoryItem.ITEM_TYPE.NONE;
 
             StructureBrain closest_sign = null;
-            float closest_distance = Settings.State.farmSignRadius + 1f;
+            float closest_distance = Settings.State.farmSignRadius - 1f;
             foreach (StructureBrain sign in signs ?? StructureManager.GetAllStructuresOfType(StructureBrain.TYPES.FARM_PLOT_SIGN))
             {
                 float distance = Vector3.Distance(building.Data.Position, sign.Data.Position);
@@ -203,6 +233,9 @@ namespace FireDevil
             }
         }
 
+        /// <summary>
+        /// Apply bonus resources when farming with nature necklace.
+        /// </summary>
         [HarmonyPatch(typeof(FollowerTask_Farm), nameof(FollowerTask_Farm.ProgressTask))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler_NatureNecklaceFix(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
@@ -233,6 +266,9 @@ namespace FireDevil
         }
     }
 
+    /// <summary>
+    /// Change Farm Station radius
+    /// </summary>
     [HarmonyPatch]
     public static class Patch_Farming2
     {
@@ -264,6 +300,9 @@ namespace FireDevil
         }
     }
 
+    /// <summary>
+    /// Change Farm Sign radius
+    /// </summary>
     [HarmonyPatch]
     public static class Patch_Farming3
     {

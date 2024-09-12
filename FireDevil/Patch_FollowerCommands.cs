@@ -37,11 +37,9 @@ namespace FireDevil
                 if (!__result.Any(a => a.Command == FollowerCommands.Murder))
                     __result.Insert(Math.Min(1, __result.Count), FollowerCommandItems.Murder());
             }
-
-            if (Settings.State.hideNecklaceAction)
-            {
-                __result.RemoveAll(a => a.Command is FollowerCommands.HideNecklace or FollowerCommands.RemoveNecklace);
-            }
+            
+            if (Settings.State.hideNecklaceAction)            
+                __result.RemoveAll(a => a.Command is FollowerCommands.HideNecklace or FollowerCommands.RemoveNecklace);            
         }
 
         [HarmonyPatch(typeof(FollowerCommandGroups), nameof(FollowerCommandGroups.OldAgeCommands))]
@@ -54,7 +52,7 @@ namespace FireDevil
                     __result.Insert(Math.Min(1, __result.Count), FollowerCommandItems.Murder());
             }
 
-            if (follower.Brain.Info.Necklace != 0)
+            if (follower.Brain.Info.Necklace != 0 && !Settings.State.hideNecklaceAction)
             {
                 __result.Add(FollowerCommandItems.RemoveNecklace(follower.Brain.Info.Necklace));
             }
@@ -115,6 +113,33 @@ namespace FireDevil
             }
         }
 
+        [HarmonyPatch(typeof(FollowerCommandGroups), nameof(FollowerCommandGroups.ZombieCommands))]
+        [HarmonyPostfix]
+        public static void Zombie(Follower follower, ref List<CommandItem> __result)
+        {
+            if (Inventory.HasGift())
+                __result.Add(FollowerCommandItems.Gift());
+
+            if (follower.Brain.Info.Necklace != 0 && !Settings.State.hideNecklaceAction)
+            {
+                __result.Add(FollowerCommandItems.RemoveNecklace(follower.Brain.Info.Necklace));
+                if (follower.Brain.Info.ShowingNecklace)
+                {
+                    __result.Add(FollowerCommandItems.HideNecklace(follower.Brain.Info.Necklace));
+                }
+                else
+                {
+                    __result.Add(FollowerCommandItems.ShowNecklace(follower.Brain.Info.Necklace));
+                }
+            }
+
+            if (Settings.State.showMurderAction)
+            {
+                if (!__result.Any(a => a.Command == FollowerCommands.Murder))
+                    __result.Insert(Math.Min(1, __result.Count), FollowerCommandItems.Murder());
+            }
+        }
+
         //[HarmonyPatch(typeof(FollowerCommandGroups), nameof(FollowerCommandGroups.WakeUpCommands))]
         //[HarmonyPostfix]
         //public static void Asleep(ref List<CommandItem> __result)
@@ -133,6 +158,7 @@ namespace FireDevil
         [HarmonyTargetMethods]
         public static IEnumerable<MethodBase> TargetMethods()
         {
+            int count = 0;
             foreach (var type in typeof(interaction_FollowerInteraction).GetNestedTypes(AccessTools.all))
             {
                 if (!type.IsClass)
@@ -141,21 +167,32 @@ namespace FireDevil
                 {
                     var mi = type.GetMethod("MoveNext", AccessTools.all, null, [], null);
                     if (mi != null)
+                    {
                         yield return mi;
+                        count++;
+                    }
                 }
                 else if (type.Name.StartsWith("<BlessRoutine>"))
                 {
                     var mi = type.GetMethod("MoveNext", AccessTools.all, null, [], null);
                     if (mi != null)
+                    {
                         yield return mi;
+                        count++;
+                    }
                 }
                 else if (type.Name.StartsWith("<IntimidateRoutine>"))
                 {
                     var mi = type.GetMethod("MoveNext", AccessTools.all, null, [], null);
                     if (mi != null)
+                    {
                         yield return mi;
+                        count++;
+                    }
                 }
             }
+            if (count != 3)
+                throw new Exception($"Unable to resolve target methods count={count}");
         }
 
         [HarmonyTranspiler]

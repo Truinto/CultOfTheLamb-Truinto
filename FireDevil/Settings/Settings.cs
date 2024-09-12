@@ -24,7 +24,9 @@ namespace FireDevil
         [JsonProperty] public bool freeHeavyAttack = true;
         [JsonProperty] public bool siloBucketInfinite = false;
         [JsonProperty] public bool blessSuperRange = true;
+        [JsonProperty] public bool zombiesDoWork = true;
 
+        [JsonProperty] public float goldenEggChance = 0.2f;
         [JsonProperty] public float storageShrineMult = 1.0f;
         [JsonProperty] public float storageOuthouseMult = 1.0f;
         [JsonProperty] public float storageSiloMult = 1.0f;
@@ -39,6 +41,8 @@ namespace FireDevil
         [JsonProperty] public float propagandaSpeakerRadius = 8f;
         [JsonProperty] public float farmStationRadius = 6f;
         [JsonProperty] public float farmSignRadius = 5f;
+
+        [JsonProperty] public SeasonalEventType forceSeasonalEvent = SeasonalEventType.None;
 
         protected override bool OnUpdate()
         {

@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.3]
+- infinite bucket also applies to fertilizer
+- cover more fleece for debuff removal
+- made it so zombie won't eat followers if they wear a loyality necklace or the victim is immortal
+- made it so giving up Baal or Aym to Forneus lets you keep them
+- show all traits in follower menus
+- added option to force seasonal event
+- added option to set golden egg chances
+- added option to make zombies do work
+
 ## [2.0.2]
 - fixed issue with seed silo
 - fixed inventory redirect not working

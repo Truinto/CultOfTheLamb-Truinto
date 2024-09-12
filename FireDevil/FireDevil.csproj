@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>2.0.2</Version>
+		<Version>2.0.3.27</Version>
 		<TargetFramework>net48</TargetFramework>
 		<Configurations>Debug;Release;Release_Bep</Configurations>
 	</PropertyGroup>
@@ -39,6 +39,7 @@
 		<Reference Private="false" Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Private="false" Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
 		<Reference Private="false" Include="UnityEngine.Physics2DModule" HintPath="$(GameManaged)\UnityEngine.Physics2DModule.dll" />
+		<Reference Private="false" Include="FMODUnity" HintPath="$(GameManaged)\FMODUnity.dll" />
 	</ItemGroup>
 
 	<!-- Other Files -->

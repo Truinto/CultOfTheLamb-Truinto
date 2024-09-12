@@ -34,6 +34,24 @@ namespace FireDevil
             return true;
         }
 
+        /// <summary>
+        /// Stores items directly to player inventory, instead of structure inventory.
+        /// </summary>
+        [HarmonyPatch(typeof(FollowerTask_ResourceStation), nameof(FollowerTask_ResourceStation.DepositResource))]
+        [HarmonyPostfix]
+        public static void Postfix_RedirectPlayerInventory2(FollowerTask_ResourceStation __instance)
+        {
+            if (!Settings.State.redirectPlayerInventory)
+                return;
+
+            var inventory = __instance._resourceStation.Data.Inventory;
+            for (int i = inventory.Count - 1; i >= 1; i--)
+            {
+                Inventory.AddItem(inventory[i].type, inventory[i].quantity, true);
+                inventory.RemoveAt(i);
+            }
+        }
+
         [HarmonyPatch(typeof(Structures_Shrine), nameof(Structures_Shrine.SoulMax), MethodType.Getter)]
         [HarmonyPostfix]
         public static void Postfix1(ref int __result)

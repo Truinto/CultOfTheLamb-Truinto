@@ -39,7 +39,7 @@ namespace FireDevil
         /// </summary>
         [HarmonyPatch(typeof(FollowerTask_EatFeastTable), nameof(FollowerTask_EatFeastTable.OnEnd))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> FeastHunger(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> HungerLimit(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var tool = new TranspilerTool(instructions, generator, original);
             tool.Seek(a => a.Calls(AccessTools.PropertySetter(typeof(FollowerBrainStats), nameof(FollowerBrainStats.Satiation))));
@@ -50,6 +50,37 @@ namespace FireDevil
             {
                 instance.Satiation += value;
             }
+        }
+
+        /// <summary>
+        /// Feast adds 100 satiation, instead of setting to 100.
+        /// </summary>
+        [HarmonyPatch("RitualFeast+<RitualRoutine>d__3", "MoveNext")] // TODO: dynamically to prevent update issues
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> HungerLimit2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        {
+            var tool = new TranspilerTool(instructions, generator, original);
+            tool.Seek(a => a.Calls(AccessTools.PropertySetter(typeof(FollowerBrainStats), nameof(FollowerBrainStats.Satiation))));
+            tool.ReplaceCall(patch);
+            return tool;
+
+            static void patch(FollowerBrainStats instance, float value)
+            {
+                instance.Satiation += value;
+            }
+        }
+
+        /// <summary>
+        /// Remove satiation limit.
+        /// </summary>
+        [HarmonyPatch(typeof(FollowerInfo), nameof(FollowerInfo.Satiation), MethodType.Setter)]
+        [HarmonyPrefix]
+        public static bool FeastHunger(FollowerInfo __instance, float value)
+        {
+            if (!Settings.State.loyaltyOverflow)
+                return true;
+            __instance._satiation = Mathf.Clamp(value, 0f, 200f);
+            return false;
         }
 
         [HarmonyPatch(typeof(FollowerTask_Cook), nameof(FollowerTask_Cook.MealFinishedCooking))]
