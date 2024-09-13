@@ -17,36 +17,44 @@ Disclaimers
 
 Installation
 -----------
-* Download [Unity Mod Manager](https://www.nexusmods.com/site/mods/21) v0.24.5 or higher.
-* Unpack the manager anywhere.
-* Start Unity Mod Manager and select the game Cult Of The Lamb. Select your game folder (for me "GOG Galaxy\Games\Cult of the Lamb").
-* Click install.
-* Download a [release](https://github.com/Truinto/CultOfTheLamb-Truinto/releases).
-* Switch to the mod tab and drop the zip file into the manager.
+* Get [Unity Mod Manager](https://www.nexusmods.com/site/mods/21) or [BepExIn](https://github.com/BepInEx/BepInEx/releases/latest).
+* Go to [Releases](https://github.com/Truinto/CultOfTheLamb-Truinto/releases) and download the mod.
+* Unpack in the respective mod folder.
 * Have fun.
 
 Content
 -----------
-* Enables murder interaction regardless of doctrine. You can probably break the introduction with this.
-* Lumber and stone have infinite resources
-* Display job description in follower thoughts
-* Menu to toggle doctines
-* Menu to set probability of certain weapons to show up
-* Option to disable most fleece penalties
-* Increase shrine/outhouse/silo storage
-* Option to have follower loyalty overflow to next level
-* Option to instantly pickup mine resources
-* Change follower skin
-* Add/remove follower traits
-
-FAQ
------------
-Q: My controller can't go right? \
-A: If you press F10 it opens a report box. This prevents right movement for some reason. Press F10 again to fix it. If you need the mod menu a lot, I recommend setting a different hotkey (like F11).
+* Automatically add cooking tasks
+* Always show murder action
+* Show follower role in thoughts
+* Infinite Lumber and Stone Mine
+* Instantly pickup mine resources
+* Redirect items to player inventory (farm, refinery, mine)
+* Hide popup when item is collected
+* Disable most fleece penalties
+* Allow follower loyalty overflow to next level
+* Heavy attacks consume no fervour
+* Seed bucket gives out infinte seeds even if empty
+* Bless has 10x bigger radius
+* Zombies do work
+* Set Golden egg chance
+* Set Shrine soul maximum multiplier
+* Set Outhouse maximum multiplier
+* Set Silo maximum multiplier
+* Set Compost multiplier
+* Set Compost cost (grass)
+* Set Ritual cost multiplier
+* Set Ritual cooldown multiplier
+* Set Harvest Totem radius
+* Set Propaganda Speaker radius
+* Set Farm Station radius
+* Set Farm Sign radius
+* Force set Seasonal Event
+* Menu to toggle doctines (UnityModManager only)
+* Menu to add/remove follower traits (UnityModManager only)
 
 Build
 -----------
 * Clone repo
-* (Re-)install nuget AssemblyPublicizer by vikigenius
-* Rename Directory.Build.props.default to Directory.Build.props.user
+* Copy Directory.Build.props.default to Directory.Build.props.user
 * Open and edit Directory.Build.props.user with your game location
