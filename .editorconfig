@@ -1,5 +1,12 @@
-is_global = true
-#[*.cs]
+root = true
+
+[*]
+end_of_line = lf
+
+[*.bat]
+end_of_line = crlf
+
+[*.cs]
 
 #### Benutzerdefiniert ####
 # none: komplett ignoriert
@@ -29,6 +36,12 @@ dotnet_diagnostic.CA1041.severity = none
 # CA1069: Enumerationswerte dürfen nicht dupliziert werden
 dotnet_diagnostic.CA1069.severity = none
 
+# CA1866: Char-Überladung verwenden
+dotnet_diagnostic.CA1866.severity = none
+
+# CS0164: Auf diese Bezeichnung wurde nicht verwiesen.
+dotnet_diagnostic.CS0164.severity = none
+
 # CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 dotnet_diagnostic.CS1591.severity = suggestion
 
@@ -50,8 +63,8 @@ indent_style = space
 tab_width = 4
 
 # Einstellungen für neue Zeilen
-end_of_line = crlf
-insert_final_newline = false
+end_of_line = lf
+insert_final_newline = true
 
 #### .NET-Codierungskonventionen ####
 
