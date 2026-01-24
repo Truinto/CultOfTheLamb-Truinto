@@ -51,11 +51,11 @@ namespace FireDevil
             PatchSafe(typeof(Patch_Mating));
 #if !DEBUG
             var nullFinalizer = new HarmonyMethod(AccessTools.Method(typeof(Main), nameof(Main.NullFinalizer)));
-            foreach (var patch in harmony.GetPatchedMethods().ToArray())
+            foreach (var patch in HarmonyInstance.GetPatchedMethods().ToArray())
             {
                 if (Harmony.GetPatchInfo(patch).Finalizers.Count == 0)
                 {
-                    harmony.Patch(patch, finalizer: nullFinalizer);
+                    HarmonyInstance.Patch(patch, finalizer: nullFinalizer);
                     Print("Applied finalizer to " + patch.Name);
                 }
             }
