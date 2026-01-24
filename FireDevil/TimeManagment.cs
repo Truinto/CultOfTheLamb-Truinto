@@ -17,7 +17,7 @@ namespace FireDevil
 
         public static void OnNewDay()
         {
-            var resource_chest = StructureManager.GetAllStructuresOfType<Structures_CollectedResourceChest>(FollowerLocation.Base);
+            //var resource_chest = StructureManager.GetAllStructuresOfType<Structures_CollectedResourceChest>(FollowerLocation.Base);
         }
     }
 }

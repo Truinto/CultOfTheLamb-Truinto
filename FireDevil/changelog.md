@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.1.0]
+- updated to version 1.5.15.323
+
 ## [2.0.3]
 - infinite bucket also applies to fertilizer
 - cover more fleece for debuff removal

@@ -16,19 +16,17 @@ namespace FireDevil
     public static class Main
     {
         #region Fields
-        public const string version = "2.0.3";
-        internal static ILogger logger;
-        public static string ModPath;
-        public static Harmony harmony;
 
-        private static FieldInfo IntRange_Min = typeof(IntRange).GetField("<Min>k__BackingField", AccessTools.all);
-        private static FieldInfo IntRange_Max = typeof(IntRange).GetField("<Max>k__BackingField", AccessTools.all);
+        internal static ILogger _Logger = null!;
+        public static string ModPath = null!;
+        public static Harmony HarmonyInstance = null!;
+
         #endregion
 
         public static void Load()
         {
             ModPath ??= Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            harmony ??= new Harmony("Truinto.FireDevil");
+            HarmonyInstance ??= new Harmony("Truinto.FireDevil");
 #if DEBUG
             //PatchSafe(typeof(Patch_GetTasks));
 #endif
@@ -80,7 +78,7 @@ namespace FireDevil
 
         public static void Print(string msg)
         {
-            logger?.Log(msg);
+            _Logger?.Log(msg);
         }
 
         internal static void PatchSafe(Type patch)
@@ -88,7 +86,7 @@ namespace FireDevil
             try
             {
                 Print("Patching " + patch.Name);
-                harmony.CreateClassProcessor(patch).Patch();
+                HarmonyInstance.CreateClassProcessor(patch).Patch();
             }
             catch (Exception e) { Print(e.ToString()); }
         }
@@ -102,7 +100,7 @@ namespace FireDevil
             catch (Exception e) { Print(e.ToString()); }
         }
 
-        internal static Exception NullFinalizer(Exception __exception)
+        internal static Exception? NullFinalizer(Exception? __exception)
         {
 #if !DEBUG
             return null;
@@ -129,9 +127,9 @@ namespace FireDevil
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnHideGUI = OnHideGUI;
 
-            Main.logger = new Logger_UMM(modEntry.Logger);
+            Main._Logger = new Logger_UMM(modEntry.Logger);
             Main.ModPath = modEntry.Path;
-            Main.harmony = new Harmony("Truinto.FireDevil");
+            Main.HarmonyInstance = new Harmony("Truinto.FireDevil");
 
             Main.PatchSafe(typeof(Patch_Lockstate));
             Main.Load();
@@ -139,13 +137,13 @@ namespace FireDevil
             return true;
         }
 
-        private static GUIStyle StyleBox;
-        private static GUIStyle StyleLine;
-        private static GUILayoutOption DontExpand = GUILayout.ExpandWidth(false);
-        private static bool[] Toggles = new bool[5];
-        private static int LastTrait;
-        private static Regex RxClean = new("<.*?>");
-        private static FollowerTrait.TraitType[] _AllTraits;
+        private static GUIStyle? _StyleBox;
+        private static GUIStyle? _StyleLine;
+        private static GUILayoutOption _DontExpand = GUILayout.ExpandWidth(false);
+        private static bool[] _Toggles = new bool[5];
+        private static int _LastTrait;
+        private static Regex _RxClean = new("<.*?>");
+        private static FollowerTrait.TraitType[]? _AllTraits;
         public static FollowerTrait.TraitType[] AllTraits
         {
             get
@@ -163,14 +161,14 @@ namespace FireDevil
 
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            if (StyleBox == null)
+            if (_StyleBox == null || _StyleLine == null)
             {
-                StyleBox = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleCenter };
-                StyleLine = new GUIStyle() { fixedHeight = 1, margin = new RectOffset(0, 0, 4, 4), };
-                StyleLine.normal.background = new Texture2D(1, 1);
+                _StyleBox = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleCenter };
+                _StyleLine = new GUIStyle() { fixedHeight = 1, margin = new RectOffset(0, 0, 4, 4), };
+                _StyleLine.normal.background = new Texture2D(1, 1);
             }
 
-            if (Folder(ref Toggles[0], "Settings"))
+            if (Folder(ref _Toggles[0], "Settings"))
             {
                 GUILayout.Space(5);
                 //Checkbox(ref Settings.State.globalTaskPatch, "Injects new task types");
@@ -208,13 +206,13 @@ namespace FireDevil
                 GUILayout.Space(10);
             }
 
-            if (Folder(ref Toggles[1], "Doctrines"))
+            if (Folder(ref _Toggles[1], "Doctrines"))
             {
                 GUILayout.Space(5);
                 foreach (var doctrine in Unlocks.GetDoctrines())
                 {
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(DoctrineUpgradeSystem.GetUnlocked(doctrine) ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
+                    if (GUILayout.Button(DoctrineUpgradeSystem.GetUnlocked(doctrine) ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(20)))
                         Unlocks.ToggleUnlock(doctrine);
                     GUILayout.Space(5);
                     GUILayout.Label(DoctrineUpgradeSystem.GetSermonCategoryLocalizedName(DoctrineUpgradeSystem.GetCategory(doctrine)), GUILayout.Width(200));
@@ -223,7 +221,7 @@ namespace FireDevil
                     int num = name.IndexOf('>');
                     if (num > 0)
                         name = name.Substring(num + 1);
-                    GUILayout.Label(name, DontExpand);
+                    GUILayout.Label(name, _DontExpand);
                     GUILayout.EndHorizontal();
                 }
                 GUILayout.Space(10);
@@ -234,7 +232,7 @@ namespace FireDevil
             //Inventory.AddItem
 
             //todo DataManager.AllNecklaces
-            if (Folder(ref Toggles[2], "Followers"))
+            if (Folder(ref _Toggles[2], "Followers"))
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Name", GUILayout.Width(150));
@@ -259,10 +257,10 @@ namespace FireDevil
                 {
                     GUILayout.BeginHorizontal();
 
-                    StringField(ref follower.Name, 150f);
+                    StringField(ref follower._name, 150f);
                     GUILayout.Label(follower.Age.ToString().ColorCond(follower.Age >= follower.LifeExpectancy, "red"), GUILayout.Width(30));
                     GUILayout.Label(follower.LifeExpectancy.ToString(), GUILayout.Width(50));
-                    if (GUILayout.Button(follower.CursedState.ToString(), StyleBox, GUILayout.Width(70)))
+                    if (GUILayout.Button(follower.CursedState.ToString(), _StyleBox, GUILayout.Width(70)))
                     {
                         if (follower.CursedState == Thought.OldAge)
                             follower.LifeExpectancy = follower.Age + 20;
@@ -270,11 +268,11 @@ namespace FireDevil
                     }
                     EnumField(ref follower.Necklace, width: 100f, values: Necklaces);
                     EnumField(ref follower.FollowerRole, width: 100f);
-                    if (GUILayout.Button(follower.MarriedToLeader ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                    if (GUILayout.Button(follower.MarriedToLeader ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                         follower.MarriedToLeader = !follower.MarriedToLeader;
-                    if (GUILayout.Button(follower.FaithEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                    if (GUILayout.Button(follower.FaithEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                         follower.MarriedToLeader = !follower.MarriedToLeader;
-                    if (GUILayout.Button(follower.TaxEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                    if (GUILayout.Button(follower.TaxEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                         follower.MarriedToLeader = !follower.MarriedToLeader;
                     GUILayout.Label(follower._satiation.ToString("F2"), GUILayout.Width(50));
 
@@ -295,12 +293,12 @@ namespace FireDevil
                     villager_Info.SkinColour = Random.Range(0, WorshipperData.Instance.GetColourData(villager_Info.SkinName).SlotAndColours.Count);
                      */
 
-                    if (GUILayout.Button(LastTrait == follower.ID ? "<b>▼</b> Traits" : "<b>▶</b> Traits", StyleBox, GUILayout.Width(70)))
-                        LastTrait = LastTrait == follower.ID ? -1 : follower.ID;
+                    if (GUILayout.Button(_LastTrait == follower.ID ? "<b>▼</b> Traits" : "<b>▶</b> Traits", _StyleBox, GUILayout.Width(70)))
+                        _LastTrait = _LastTrait == follower.ID ? -1 : follower.ID;
 
                     GUILayout.EndHorizontal();
 
-                    if (LastTrait == follower.ID)
+                    if (_LastTrait == follower.ID)
                     {
                         foreach (var trait in AllTraits)
                         {
@@ -308,13 +306,13 @@ namespace FireDevil
                             GUILayout.Space(5);
 
                             bool hasTrait = follower.Traits.Contains(trait);
-                            if (GUILayout.Button(hasTrait ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                            if (GUILayout.Button(hasTrait ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                                 if (hasTrait)
                                     follower.Traits.Remove(trait);
                                 else
                                     follower.Traits.Add(trait);
                             GUILayout.Space(5);
-                            GUILayout.Label($"{FollowerTrait.GetLocalizedTitle(trait)}: {RxClean.Replace(FollowerTrait.GetLocalizedDescription(trait), "")}", DontExpand);
+                            GUILayout.Label($"{FollowerTrait.GetLocalizedTitle(trait)}: {_RxClean.Replace(FollowerTrait.GetLocalizedDescription(trait), "")}", _DontExpand);
 
                             GUILayout.EndHorizontal();
                         }
@@ -322,7 +320,7 @@ namespace FireDevil
                 }
             }
 
-            if (Folder(ref Toggles[3], "Dead Followers"))
+            if (Folder(ref _Toggles[3], "Dead Followers"))
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Name", GUILayout.Width(150));
@@ -344,19 +342,19 @@ namespace FireDevil
                     var follower = DataManager.Instance.Followers_Dead[i];
                     GUILayout.BeginHorizontal();
 
-                    StringField(ref follower.Name, 150f);
+                    StringField(ref follower._name, 150f);
                     GUILayout.Label(follower.Age.ToString().ColorCond(follower.Age >= follower.LifeExpectancy, "red"), GUILayout.Width(30));
                     GUILayout.Label(follower.LifeExpectancy.ToString(), GUILayout.Width(50));
-                    if (GUILayout.Button(follower.MarriedToLeader ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                    if (GUILayout.Button(follower.MarriedToLeader ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                         follower.MarriedToLeader = !follower.MarriedToLeader;
-                    if (GUILayout.Button(follower.FaithEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                    if (GUILayout.Button(follower.FaithEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                         follower.MarriedToLeader = !follower.MarriedToLeader;
-                    if (GUILayout.Button(follower.TaxEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                    if (GUILayout.Button(follower.TaxEnforcer ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                         follower.MarriedToLeader = !follower.MarriedToLeader;
 
                     GUILayout.Label(follower.SkinName.ToString(), GUILayout.Width(100));
 
-                    if (!FollowerManager.UniqueFollowerIDs.Contains(follower.ID) && GUILayout.Button("Remove", StyleBox, GUILayout.Width(70)))
+                    if (!FollowerManager.UniqueFollowerIDs.Contains(follower.ID) && GUILayout.Button("Remove", _StyleBox, GUILayout.Width(70)))
                     {
                         DataManager.Instance.Followers_Dead.Remove(follower);
                         DataManager.Instance.Followers_Dead_IDs.Remove(follower.ID);
@@ -364,12 +362,12 @@ namespace FireDevil
                         ObjectiveManager.FailUniqueFollowerObjectives(follower.ID);
                     }
 
-                    if (GUILayout.Button(LastTrait == follower.ID ? "<b>▼</b> Traits" : "<b>▶</b> Traits", StyleBox, GUILayout.Width(70)))
-                        LastTrait = LastTrait == follower.ID ? -1 : follower.ID;
+                    if (GUILayout.Button(_LastTrait == follower.ID ? "<b>▼</b> Traits" : "<b>▶</b> Traits", _StyleBox, GUILayout.Width(70)))
+                        _LastTrait = _LastTrait == follower.ID ? -1 : follower.ID;
 
                     GUILayout.EndHorizontal();
 
-                    if (LastTrait == follower.ID)
+                    if (_LastTrait == follower.ID)
                     {
                         foreach (var trait in AllTraits)
                         {
@@ -377,13 +375,13 @@ namespace FireDevil
                             GUILayout.Space(5);
 
                             bool hasTrait = follower.Traits.Contains(trait);
-                            if (GUILayout.Button(hasTrait ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(50)))
+                            if (GUILayout.Button(hasTrait ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(50)))
                                 if (hasTrait)
                                     follower.Traits.Remove(trait);
                                 else
                                     follower.Traits.Add(trait);
                             GUILayout.Space(5);
-                            GUILayout.Label($"{FollowerTrait.GetLocalizedTitle(trait)}: {RxClean.Replace(FollowerTrait.GetLocalizedDescription(trait), "")}", DontExpand);
+                            GUILayout.Label($"{FollowerTrait.GetLocalizedTitle(trait)}: {_RxClean.Replace(FollowerTrait.GetLocalizedDescription(trait), "")}", _DontExpand);
 
                             GUILayout.EndHorizontal();
                         }
@@ -392,16 +390,16 @@ namespace FireDevil
             }
 
             // Debug
-            if (GUILayout.Button("Debug Crows", DontExpand))
+            if (GUILayout.Button("Debug Crows", _DontExpand))
             {
                 try
                 {
                     foreach (var structureBrain in StructureManager.StructuresAtLocation(FollowerLocation.Base))
                     {
-                        if (structureBrain is Structures_Scarecrow _scareCrow)
+                        if (structureBrain is Structures_Scarecrow scareCrow)
                         {
-                            _scareCrow.HasBird = true;
-                            _scareCrow.OnCatchBird?.Invoke();
+                            scareCrow.HasBird = true;
+                            scareCrow.OnCatchBird?.Invoke();
                         }
                     }
 
@@ -410,11 +408,11 @@ namespace FireDevil
                 }
                 catch (Exception e) { Main.Print(e.ToString()); }
             }
-            if (GUILayout.Button("Debug +1000 gold", DontExpand))
+            if (GUILayout.Button("Debug +1000 gold", _DontExpand))
             {
                 Inventory.AddItem(InventoryItem.ITEM_TYPE.BLACK_GOLD, 1000, true);
             }
-            if (GUILayout.Button("Debug farm plots", DontExpand))
+            if (GUILayout.Button("Debug farm plots", _DontExpand))
             {
                 foreach (var silo in StructureManager.GetAllStructuresOfType<Structures_SiloSeed>(FollowerLocation.Base))
                 {
@@ -426,11 +424,11 @@ namespace FireDevil
                     Main.Print($"plant={plot.Data.GrowthStage:00.00} seed={(InventoryItem.ITEM_TYPE)(plot.GetPlantedSeed()?.type ?? 0)}");
                 }
             }
-            if (GUILayout.Button("Debug unkill Ratau", DontExpand))
+            if (GUILayout.Button("Debug unkill Ratau", _DontExpand))
             {
                 DataManager.Instance.RatauKilled = false;
             }
-            if (GUILayout.Button("Debug zombie job", DontExpand))
+            if (GUILayout.Button("Debug zombie job", _DontExpand))
             {
                 var tasks = new SortedList<float, FollowerTask>();
                 foreach (var farm in StructureManager.GetAllStructuresOfType<Structures_FarmerStation>(FollowerLocation.Base))
@@ -449,7 +447,7 @@ namespace FireDevil
                     }
                 }
             }
-            if (GUILayout.Button("Debug check skins", DontExpand))
+            if (GUILayout.Button("Debug check skins", _DontExpand))
             {
                 foreach (WorshipperData.SkinAndData item in WorshipperData.Instance.GetSkinsAll())
                 {
@@ -467,7 +465,7 @@ namespace FireDevil
             }
 
             //DataManager.FollowerSkinsBlacklist
-            if (!DataManager.instance.FollowerSkinsUnlocked.Contains("DogTeddy") && GUILayout.Button("Debug unlock DogTeddy", DontExpand))
+            if (!DataManager.instance.FollowerSkinsUnlocked.Contains("DogTeddy") && GUILayout.Button("Debug unlock DogTeddy", _DontExpand))
                 DataManager.instance.FollowerSkinsUnlocked.Add("DogTeddy");
         }
 
@@ -477,25 +475,25 @@ namespace FireDevil
         {
         }
 
-        private static void Checkbox(ref bool value, string label, Action action = null)
+        private static void Checkbox(ref bool value, string label, Action? action = null)
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
+            if (GUILayout.Button(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", _StyleBox, GUILayout.Width(20)))
             {
                 value = !value;
                 action?.Invoke();
             }
             GUILayout.Space(5);
-            GUILayout.Label(label, DontExpand);
+            GUILayout.Label(label, _DontExpand);
             GUILayout.EndHorizontal();
         }
 
-        private static void NumberField(ref float value, string label = null, float width = 100f, Action action = null)
+        private static void NumberField(ref float value, string? label = null, float width = 100f, Action? action = null)
         {
             if (label != null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(label + ": ", DontExpand);
+                GUILayout.Label(label + ": ", _DontExpand);
             }
 
             if (float.TryParse(GUILayout.TextField(value.ToString("0.0"), GUILayout.Width(width)), out float newvalue) && value != newvalue)
@@ -508,12 +506,12 @@ namespace FireDevil
                 GUILayout.EndHorizontal();
         }
 
-        private static void NumberField(ref int value, string label = null, int min = int.MinValue, int max = int.MaxValue, float width = 100f, Action action = null)
+        private static void NumberField(ref int value, string? label = null, int min = int.MinValue, int max = int.MaxValue, float width = 100f, Action? action = null)
         {
             if (label != null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(label + ": ", DontExpand);
+                GUILayout.Label(label + ": ", _DontExpand);
             }
 
             if (int.TryParse(GUILayout.TextField(value.ToString(), GUILayout.Width(width)), out int newvalue))
@@ -530,15 +528,15 @@ namespace FireDevil
                 GUILayout.EndHorizontal();
         }
 
-        private static void EnumField<T>(ref T value, string label = null, float width = 100f, Action action = null, T[] values = null)
+        private static void EnumField<T>(ref T value, string? label = null, float width = 100f, Action? action = null, T[]? values = null) where T : Enum
         {
             if (label != null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(label + ": ", DontExpand);
+                GUILayout.Label(label + ": ", _DontExpand);
             }
 
-            if (GUILayout.Button(value.ToString(), StyleBox, GUILayout.Width(width)))
+            if (GUILayout.Button(value.ToString(), _StyleBox, GUILayout.Width(width)))
             {
                 values ??= (T[])typeof(T).GetEnumValues();
                 int index = values.IndexOf(value) + 1;
@@ -552,7 +550,7 @@ namespace FireDevil
                 GUILayout.EndHorizontal();
         }
 
-        private static void StringField(ref string value, float width = 100f, Action action = null)
+        private static void StringField(ref string value, float width = 100f, Action? action = null)
         {
             //string newvalue = GUILayout.TextField(CursorIndex == CursorCounter ? CursorBuffer : value, GUILayout.Width(width));
             string newvalue = GUILayout.TextField(value, GUILayout.Width(width));
@@ -567,7 +565,7 @@ namespace FireDevil
         private static bool Folder(ref bool flag, string text)
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(flag ? "<color=lime><b>▼</b></color>" : "<color=yellow><b>▶</b></color>", StyleBox, GUILayout.Width(20)))
+            if (GUILayout.Button(flag ? "<color=lime><b>▼</b></color>" : "<color=yellow><b>▶</b></color>", _StyleBox, GUILayout.Width(20)))
                 flag = !flag;
             GUILayout.Space(3);
             GUILayout.Label(text);
@@ -576,7 +574,7 @@ namespace FireDevil
             return flag;
         }
 
-        private static string ColorCond(this string text, bool cond, string ifTrue, string ifFalse = null)
+        private static string ColorCond(this string text, bool cond, string ifTrue, string? ifFalse = null)
         {
             if (cond)
                 return $"<color={ifTrue}>{text}</color>";
@@ -587,7 +585,7 @@ namespace FireDevil
         }
     }
 #elif BEPINEX
-    [BepInPlugin("Truinto.FireDevil", "FireDevil", Main.version)]
+    [BepInPlugin("Truinto." + ModInfo.MOD_NAME, ModInfo.MOD_NAME, ModInfo.MOD_VERSION)]
     public class Main_Bep : BaseUnityPlugin
     {
         public void Awake()

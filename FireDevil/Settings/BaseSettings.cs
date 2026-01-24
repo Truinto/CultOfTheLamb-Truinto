@@ -6,6 +6,7 @@ using System.Text;
 
 namespace FireDevil
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006", Justification = "backwards compatibility")]
     public abstract class BaseSettings<T> : ISettings where T : BaseSettings<T>, new()
     {
         [JsonProperty] public int version;
@@ -16,7 +17,7 @@ namespace FireDevil
         [JsonProperty] public HashSet<string> Blacklist { get; protected set; } = new();
         [JsonProperty] public HashSet<string> Whitelist { get; protected set; } = new();
 
-        [JsonIgnore] public string FilePath;
+        [JsonIgnore] public string? FilePath;
         [JsonIgnore]
         public JsonSerializerSettings JSettings = new()
         {
@@ -51,7 +52,7 @@ namespace FireDevil
             try
             {
                 using var sr = new StreamReader(filePath);
-                T state = JsonConvert.DeserializeObject<T>(sr.ReadToEnd());
+                T state = JsonConvert.DeserializeObject<T>(sr.ReadToEnd()) ?? throw new NullReferenceException();
                 sr.Close();
                 state.FilePath = filePath;
 

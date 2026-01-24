@@ -22,12 +22,12 @@ namespace FireDevil
         /// </summary>
         [HarmonyPatch(typeof(Structures_SiloSeed), nameof(Structures_SiloSeed.GetClosestSeeder))]
         [HarmonyPrefix]
-        public static bool Prefix_GetSeedSiloForFarmPlot(Vector3 fromPosition, FollowerLocation location, InventoryItem.ITEM_TYPE prioritisedSeedType, List<Structures_SiloSeed> silos, ref Structures_SiloSeed __result)
+        public static bool Prefix_GetSeedSiloForFarmPlot(Vector3 fromPosition, FollowerLocation location, InventoryItem.ITEM_TYPE prioritisedSeedType, List<Structures_SiloSeed> silos, ref Structures_SiloSeed? __result)
         {
             bool modeStrict = true;
 
             silos ??= StructureManager.GetAllStructuresOfType<Structures_SiloSeed>(location);
-            Structures_SiloSeed closest_silo = null;
+            Structures_SiloSeed? closest_silo = null;
             bool check_priority = prioritisedSeedType != 0;
             bool found_priority = false;
             foreach (var silo in silos)
@@ -188,12 +188,12 @@ namespace FireDevil
         /// <summary>
         /// Gets seed type from closest sign in a 5 unit radius of <paramref name="building"/>.
         /// </summary>
-        public static InventoryItem.ITEM_TYPE GetPrioritisedSeedType(StructureBrain building, List<StructureBrain> signs = null)
+        public static InventoryItem.ITEM_TYPE GetPrioritisedSeedType(StructureBrain building, List<StructureBrain>? signs = null)
         {
             if (building == null)
                 return InventoryItem.ITEM_TYPE.NONE;
 
-            StructureBrain closest_sign = null;
+            StructureBrain? closest_sign = null;
             float closest_distance = Settings.State.farmSignRadius - 1f;
             foreach (StructureBrain sign in signs ?? StructureManager.GetAllStructuresOfType(StructureBrain.TYPES.FARM_PLOT_SIGN))
             {

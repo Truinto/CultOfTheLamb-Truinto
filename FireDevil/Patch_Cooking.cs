@@ -125,7 +125,7 @@ namespace FireDevil
             public readonly List<InventoryItem> Ingredients = ingredients;
         }
 
-        private static Recipe[] _Recipes;
+        private static Recipe[]? _Recipes;
         public static Recipe[] Recipes
         {
             get

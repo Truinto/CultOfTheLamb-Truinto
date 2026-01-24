@@ -16,16 +16,16 @@ namespace FireDevil
 #if UMM
     public class Logger_UMM : ILogger
     {
-        private UnityModManager.ModEntry.ModLogger logger;
+        private UnityModManager.ModEntry.ModLogger _Logger;
 
         public Logger_UMM(UnityModManager.ModEntry.ModLogger logger)
         {
-            this.logger = logger;
+            this._Logger = logger;
         }
 
         public void Log(string message)
         {
-            logger.Log(message);
+            _Logger.Log(message);
         }
     }
 #elif BEPINEX

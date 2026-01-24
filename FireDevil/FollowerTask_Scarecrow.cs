@@ -24,35 +24,32 @@ namespace FireDevil
 
     public class FollowerTask_Scarecrow : FollowerTask
     {
-        private FollowerLocation _location;
-        private int _scareCrowID;
-        private Structures_Scarecrow _scareCrow;
+        private FollowerLocation _Location;
+        private int _ScareCrowID;
+        private Structures_Scarecrow _ScareCrow;
         //private Follower _follower;
-        private float _progress;
-        private float _gameTimeSinceLastProgress;
+        private float _Progress;
+        private float _GameTimeSinceLastProgress;
 
         public FollowerTask_Scarecrow(int scareCrowID)
         {
-            this._scareCrowID = scareCrowID;
-            this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(scareCrowID);
-            this._location = this._scareCrow.Data.Location;
+            this._ScareCrowID = scareCrowID;
+            this._ScareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(scareCrowID);
+            this._Location = this._ScareCrow.Data.Location;
         }
 
         public override int GetSubTaskCode() => 0;
         public override float Priorty => 23f;
         public override FollowerTaskType Type => FollowerTaskType.Farm;
-        public override FollowerLocation Location => _location;
+        public override FollowerLocation Location => _Location;
 
         public override PriorityCategory GetPriorityCategory(FollowerRole FollowerRole, WorkerPriority WorkerPriority, FollowerBrain brain)
         {
-            switch (FollowerRole)
+            return FollowerRole switch
             {
-                case FollowerRole.Worker:
-                case FollowerRole.Farmer:
-                    return PriorityCategory.Medium;
-                default:
-                    return PriorityCategory.Low;
-            }
+                FollowerRole.Worker or FollowerRole.Farmer => PriorityCategory.Medium,
+                _ => PriorityCategory.Low,
+            };
         }
 
         /// <summary>
@@ -60,9 +57,9 @@ namespace FireDevil
         /// </summary>
         public override void ClaimReservations()
         {
-            this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
-            if (this._scareCrow != null)
-                this._scareCrow.ReservedForTask = true;
+            this._ScareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._ScareCrowID);
+            if (this._ScareCrow != null)
+                this._ScareCrow.ReservedForTask = true;
         }
 
         /// <summary>
@@ -70,9 +67,9 @@ namespace FireDevil
         /// </summary>
         public override void ReleaseReservations()
         {
-            this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
-            if (this._scareCrow != null)
-                this._scareCrow.ReservedForTask = false;
+            this._ScareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._ScareCrowID);
+            if (this._ScareCrow != null)
+                this._ScareCrow.ReservedForTask = false;
         }
 
         /// <summary>
@@ -85,23 +82,23 @@ namespace FireDevil
 
         public override void ProgressTask()
         {
-            this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
-            if (this._scareCrow == null)
+            this._ScareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._ScareCrowID);
+            if (this._ScareCrow == null)
             {
                 End();
                 return;
             }
 
-            this._progress += this._gameTimeSinceLastProgress;
-            this._gameTimeSinceLastProgress = 0f;
-            if (this._progress >= 4f)
+            this._Progress += this._GameTimeSinceLastProgress;
+            this._GameTimeSinceLastProgress = 0f;
+            if (this._Progress >= 4f)
             {
-                this._progress = 0f;
-                if (this._scareCrow.HasBird)
+                this._Progress = 0f;
+                if (this._ScareCrow.HasBird)
                 {
-                    Scarecrow.Scarecrows.FirstOrDefault(f => f.Brain == this._scareCrow)?.OpenTrap();
-                    this._scareCrow.EmptyTrap();
-                    InventoryItem.Spawn(InventoryItem.ITEM_TYPE.MEAT, 1, this._scareCrow.Data.Position, 4f);
+                    Scarecrow.Scarecrows.FirstOrDefault(f => f.Brain == this._ScareCrow)?.OpenTrap();
+                    this._ScareCrow.EmptyTrap();
+                    InventoryItem.Spawn(InventoryItem.ITEM_TYPE.MEAT, 1, this._ScareCrow.Data.Position, 4f);
                 }
                 Loop();
             }
@@ -124,34 +121,34 @@ namespace FireDevil
 
         public override Vector3 UpdateDestination(Follower follower)
         {
-            this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
-            if (this._scareCrow == null)
+            this._ScareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._ScareCrowID);
+            if (this._ScareCrow == null)
             {
                 End();
                 return default;
             }
-            return this._scareCrow.Data.Position + new Vector3(-0.2f, 0f, 0f);
+            return this._ScareCrow.Data.Position + new Vector3(-0.2f, 0f, 0f);
         }
         
         public override void OnDoingBegin(Follower follower)
         {
-            this._scareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._scareCrowID);
-            if (this._scareCrow == null)
+            this._ScareCrow = StructureManager.GetStructureByID<Structures_Scarecrow>(this._ScareCrowID);
+            if (this._ScareCrow == null)
             {
                 End();
                 return;
             }
 
             //this._follower = follower;
-            follower.FacePosition(_scareCrow.Data.Position);
-            follower.TimedAnimation("action", 3.5f, () => ProgressTask()); // TODO: don't use timed
+            follower.FacePosition(_ScareCrow.Data.Position);
+            follower.TimedAnimation("action", 3.5f, ProgressTask); // TODO: don't use timed
         }
 
         public override void TaskTick(float deltaGameTime)
         {
             if (this.State == FollowerTaskState.Doing)
             {
-                this._gameTimeSinceLastProgress += deltaGameTime;
+                this._GameTimeSinceLastProgress += deltaGameTime;
                 //ProgressTask();
             }
         }

@@ -34,7 +34,7 @@
             }
             if (last.Refinable is not 0)
             {
-                Inventory.ChangeItemQuantity((int)last.Ingredient.CostItem, -last.Ingredient.CostValue);
+                Inventory.ChangeItemQuantity((int)last.Ingredient!.CostItem, -last.Ingredient.CostValue);
                 __instance.Data.QueuedResources.Add(last.Refinable);
                 goto again;
             }

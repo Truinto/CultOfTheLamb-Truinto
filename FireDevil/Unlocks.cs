@@ -286,6 +286,7 @@ namespace FireDevil
             DataManager.Instance.CultTraits.Remove(TraitType);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0066")]
         public static int GetLevel(DoctrineUpgradeSystem.DoctrineType doctrine)
         {
             switch (doctrine)

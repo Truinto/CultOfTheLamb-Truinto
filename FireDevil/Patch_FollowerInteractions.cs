@@ -12,7 +12,7 @@ namespace FireDevil
     {
         [HarmonyPatch(typeof(FollowerBrain), nameof(FollowerBrain.GetPersonalTask))]
         [HarmonyPostfix]
-        public static void Patch_ZombiesWork(FollowerBrain __instance, ref FollowerTask __result)
+        public static void Patch_ZombiesWork(FollowerBrain __instance, ref FollowerTask? __result)
         {
             if (!Settings.State.zombiesDoWork)
                 return;

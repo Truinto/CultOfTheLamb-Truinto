@@ -118,7 +118,7 @@ namespace FireDevil
         public static void Zombie(Follower follower, ref List<CommandItem> __result)
         {
             if (Inventory.HasGift())
-                __result.Add(FollowerCommandItems.Gift());
+                __result.Add(FollowerCommandItems.Gift(follower));
 
             if (follower.Brain.Info.Necklace != 0 && !Settings.State.hideNecklaceAction)
             {

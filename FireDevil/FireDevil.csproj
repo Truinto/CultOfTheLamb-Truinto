@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>2.0.3.27</Version>
+		<Version>2.1.0.0</Version>
 		<TargetFramework>net48</TargetFramework>
 		<Configurations>Debug;Release;Release_Bep</Configurations>
 	</PropertyGroup>
@@ -18,12 +18,13 @@
 
 	<!-- Project References -->
 	<ItemGroup>
+		<Reference Private="false" Include="Assembly-CSharp" HintPath="$(GameManaged)\Assembly-CSharp.dll" Publicize="true" />
+		
 		<Reference Private="false" Include="UnityMod" HintPath="$(SolutionDir)\@Shared\UnityMod.dll" />
 		<Reference Private="false" Include="BepInEx" HintPath="$(GameManaged)\..\..\BepInEx\core\BepInEx.dll" />
 		<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
 
 		<Reference Private="false" Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" />
-		<Reference Private="false" Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
 		<Reference Private="false" Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
 		<Reference Private="false" Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
 		<Reference Private="false" Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
@@ -54,10 +55,7 @@
 		<VersioningTask_In Include="changelog.md" />
 		<VersioningTask_Out DropRevision="never" Include="$(MSBuildThisFileFullPath)" />
 		<VersioningTask_Out DropRevision="keep" Include="info.json" />
-		<VersioningTask_Out DropRevision="keep" Include="Main.cs" />
 		<VersioningTask_Out DropRevision="keep" Include="Settings/Repository.json" Max="2" />
-
-		<TargetPublicizeItems Include="$(GameManaged)/Assembly-CSharp.dll" />
 
 		<TargetMergeItems Include="$(SolutionDir)/@Shared/UnityMod.dll" />
 
@@ -66,7 +64,8 @@
 		<TargetZipItems Include="$(ModFolder)/$(TargetName)/FireDevil.dll" />
 		<TargetZipItems Include="$(ModFolder)/$(TargetName)/changelog.md" />
 		<TargetZipItems Include="$(ModFolder)/$(TargetName)/info.json" />
-		<TargetZipTarget Condition="'$(Configuration)'=='Release_Bep'" Include="$(GameManaged)/../../Mods/$(TargetName)/$(TargetName)_BepInEx.zip" />
+		<TargetZipTarget Condition="'$(Configuration)'=='Release'" Include="$(SolutionDir)/publish/$(TargetName).zip" />
+		<TargetZipTarget Condition="'$(Configuration)'=='Release_Bep'" Include="$(SolutionDir)/publish/$(TargetName)_BepInEx.zip" />
 	</ItemGroup>
 
 </Project>

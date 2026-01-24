@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FireDevil
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006", Justification = "backwards compatibility")]
     public class Settings : BaseSettings<Settings>
     {
         public Settings() => version = 5;

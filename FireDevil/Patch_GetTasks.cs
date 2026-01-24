@@ -19,9 +19,9 @@ namespace FireDevil
                 {
                     provider.GetAvailableTasks(ScheduledActivity.Work, tasks);
                 }
-                else if (structureBrain is Structures_Scarecrow _scareCrow && _scareCrow.HasBird && !_scareCrow.ReservedForTask)
+                else if (structureBrain is Structures_Scarecrow scareCrow && scareCrow.HasBird && !scareCrow.ReservedForTask)
                 {
-                    tasks.Add(23f, new FollowerTask_Scarecrow(_scareCrow.Data.ID));
+                    tasks.Add(23f, new FollowerTask_Scarecrow(scareCrow.Data.ID));
                 }
             }
 

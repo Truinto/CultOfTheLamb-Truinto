@@ -9,7 +9,7 @@ namespace FireDevil
     [HarmonyPatch]
     public static class Patch_FollowerInfo
     {
-        private static StringBuilder sb = new(32);
+        private static StringBuilder _Sb = new(32);
 
         [HarmonyPatch(typeof(FollowerInformationBox), nameof(FollowerInformationBox.ConfigureImpl))]
         [HarmonyPostfix]
@@ -17,25 +17,25 @@ namespace FireDevil
         {
             if (Settings.State.showFollowerRole)
             {
-                sb.Append("Days:");
-                sb.Append(__instance._followerInfo.MemberDuration);
-                sb.Append(" Age:");
-                sb.Append(__instance._followerInfo.Age);
+                _Sb.Append("Days:");
+                _Sb.Append(__instance._followerInfo.MemberDuration);
+                _Sb.Append(" Age:");
+                _Sb.Append(__instance._followerInfo.Age);
                 //sb.Append(" Role:");
                 //sb.Append(FollowerRoleInfo.GetLocalizedName(__instance._followerInfo.FollowerRole));
 
-                sb.Append(" ");
+                _Sb.Append(" ");
                 bool useDelimiter = false;
-                int length = sb.Length;
+                int length = _Sb.Length;
                 foreach (var trait in __instance._followerInfo.Traits)
                 {
                     if (useDelimiter)
                     {
                         if (length <= 40)
-                            sb.Append(", ");
+                            _Sb.Append(", ");
                         else
                         {
-                            sb.Append(",\n");
+                            _Sb.Append(",\n");
                             length = 0;
                         }
                     }
@@ -43,17 +43,17 @@ namespace FireDevil
                     string trait_str = FollowerTrait.GetLocalizedTitle(trait);
 
                     if (FollowerTrait.IsPositiveTrait(trait))
-                        sb.Append("<color=green>");
+                        _Sb.Append("<color=green>");
                     else
-                        sb.Append("<color=red>");
-                    sb.Append(trait_str);
-                    sb.Append("</color>");
+                        _Sb.Append("<color=red>");
+                    _Sb.Append(trait_str);
+                    _Sb.Append("</color>");
                     length += trait_str.Length;
                     useDelimiter = true;
                 }
 
-                __instance.FollowerRole.text = sb.ToString();
-                sb.Clear();
+                __instance.FollowerRole.text = _Sb.ToString();
+                _Sb.Clear();
             }
         }
 
@@ -70,18 +70,18 @@ namespace FireDevil
                 //sb.Append(" Role:");
                 //sb.Append(FollowerRoleInfo.GetLocalizedName(__instance._followerInfo.FollowerRole));
 
-                sb.Append("\nTraits:");
+                _Sb.Append("\nTraits:");
                 bool useDelimiter = false;
                 foreach (var trait in __instance._followerInfo.Traits)
                 {
                     if (useDelimiter)
-                        sb.Append(", ");
-                    sb.Append(FollowerTrait.GetLocalizedDescription(trait));
+                        _Sb.Append(", ");
+                    _Sb.Append(FollowerTrait.GetLocalizedDescription(trait));
                     useDelimiter = true;
                 }
 
-                __instance._ageText.text += sb.ToString();
-                sb.Clear();
+                __instance._ageText.text += _Sb.ToString();
+                _Sb.Clear();
             }
         }
     }

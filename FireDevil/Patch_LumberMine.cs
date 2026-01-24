@@ -11,19 +11,12 @@ namespace FireDevil
     {
         public static bool Prefix(Structures_LumberjackStation __instance)
         {
-            switch (__instance.Data.Type)
+            return __instance.Data.Type switch
             {
-                case StructureBrain.TYPES.BLOODSTONE_MINE:
-                case StructureBrain.TYPES.LUMBERJACK_STATION:
-                    return !Settings.State.infiniteMineI;
-
-                case StructureBrain.TYPES.BLOODSTONE_MINE_2:
-                case StructureBrain.TYPES.LUMBERJACK_STATION_2:
-                    return !Settings.State.infiniteMineII;
-
-                default:
-                    return true;
-            }
+                StructureBrain.TYPES.BLOODSTONE_MINE or StructureBrain.TYPES.LUMBERJACK_STATION => !Settings.State.infiniteMineI,
+                StructureBrain.TYPES.BLOODSTONE_MINE_2 or StructureBrain.TYPES.LUMBERJACK_STATION_2 => !Settings.State.infiniteMineII,
+                _ => true,
+            };
         }
     }
 }
