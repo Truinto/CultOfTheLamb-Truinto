@@ -590,9 +590,9 @@ namespace FireDevil
     {
         public void Awake()
         {
-            Main.logger = new Logger_Bep(this.Logger);
+            Main._Logger = new Logger_Bep(this.Logger);
             Main.ModPath = Path.GetDirectoryName(this.Info.Location);
-            Main.harmony = new Harmony("Truinto.FireDevil");
+            Main.HarmonyInstance = new Harmony("Truinto.FireDevil");
 
             Main.Load();
             Main.Print($"FireDevil is loaded!");
